@@ -102,15 +102,15 @@ const TEAM_GROUPS: TeamGroup[] = [
 
 function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advisor' | 'officer' }) {
   const [broken, setBroken] = useState(false)
-  const photoSize = size === 'advisor' ? 160 : 112
-  const titleSize = size === 'advisor' ? 18 : 14
-  const monogramSize = size === 'advisor' ? 48 : 36
+  const photoSize = size === 'advisor' ? 160 : 120
+  const nameSize = size === 'advisor' ? 18 : 16
+  const monogramSize = size === 'advisor' ? 48 : 40
   const showPlaceholder = member.image === null || broken
   const monogram = member.name ? member.name[0].toUpperCase() : '·'
   const accessibleName = member.name || 'AI @ UCI officer'
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div style={{ textAlign: 'center', padding: '0 2px' }}>
       {showPlaceholder ? (
         <div
           aria-label={accessibleName}
@@ -118,7 +118,7 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
             width: photoSize,
             height: photoSize,
             margin: '0 auto',
-            borderRadius: 10,
+            borderRadius: 12,
             background: 'rgba(74,143,212,0.06)',
             border: '1px solid rgba(74,143,212,0.2)',
             display: 'flex',
@@ -140,20 +140,20 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
             width: photoSize,
             height: photoSize,
             objectFit: 'cover',
-            borderRadius: 10,
+            borderRadius: 12,
             display: 'block',
             margin: '0 auto',
-            border: '1px solid rgba(0,0,0,0.08)',
+            border: '0.5px solid rgba(0,0,0,0.08)',
           }}
         />
       )}
       <div
         style={{
           fontFamily: 'Redaction50, Georgia, serif',
-          fontSize: titleSize,
+          fontSize: nameSize,
           color: '#0a0a0a',
-          marginTop: 10,
-          lineHeight: 1.2,
+          marginTop: 14,
+          lineHeight: 1.25,
         }}
       >
         {accessibleName}
@@ -162,10 +162,10 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
         <div
           style={{
             fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-            fontSize: 11,
+            fontSize: 12,
             color: '#4a8fd4',
-            marginTop: 2,
-            lineHeight: 1.3,
+            marginTop: 6,
+            lineHeight: 1.35,
           }}
         >
           {member.role}
@@ -180,11 +180,11 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 3,
-            marginTop: 6,
+            gap: 4,
+            marginTop: 10,
             fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-            fontSize: 10,
-            color: 'rgba(10,10,10,0.45)',
+            fontSize: 11,
+            color: 'rgba(10,10,10,0.5)',
             textDecoration: 'none',
             transition: 'color 150ms ease',
           }}
@@ -192,17 +192,16 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
             ;(e.currentTarget as HTMLElement).style.color = '#4a8fd4'
           }}
           onMouseLeave={e => {
-            ;(e.currentTarget as HTMLElement).style.color = 'rgba(10,10,10,0.45)'
+            ;(e.currentTarget as HTMLElement).style.color = 'rgba(10,10,10,0.5)'
           }}
         >
           LinkedIn
           <svg
-            width="9"
-            height="9"
+            width="10"
+            height="10"
             viewBox="0 0 10 10"
             fill="none"
             aria-hidden="true"
-            style={{ marginLeft: 1 }}
           >
             <path
               d="M2 8L8 2M8 2H3.5M8 2V6.5"
@@ -228,7 +227,7 @@ export default function TeamSection() {
   return (
     <section
       id="team"
-      style={{ background: '#ffffff', padding: '64px clamp(24px, 5vw, 64px)', scrollMarginTop: 96 }}
+      style={{ background: '#ffffff', padding: '48px clamp(24px, 5vw, 64px) 96px', scrollMarginTop: 96 }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
         <FadeUp amount={0.1}>
@@ -236,7 +235,7 @@ export default function TeamSection() {
             style={{
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
               fontWeight: 400,
-              fontSize: 20,
+              fontSize: 17,
               color: '#0a0a0a',
               margin: 0,
             }}
@@ -252,7 +251,7 @@ export default function TeamSection() {
               lineHeight: 1.1,
               color: '#0a0a0a',
               fontWeight: 400,
-              margin: '12px 0 40px',
+              margin: '10px 0 56px',
             }}
           >
             Meet who&apos;s behind it.
@@ -298,31 +297,39 @@ export default function TeamSection() {
             key={group.title}
             stagger={0.05}
             amount={0.1}
+            className="team-group"
             style={{
-              maxWidth: 1200,
-              margin: gi === TEAM_GROUPS.length - 1 ? '0 auto' : '0 auto 40px',
+              width: '100%',
+              maxWidth: 960,
+              margin: '0 auto',
+              paddingTop: gi === 0 ? 0 : 48,
             }}
           >
             <FadeItem>
               <h3
                 style={{
                   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                  fontWeight: 400,
-                  fontSize: 20,
-                  color: 'rgba(10,10,10,0.9)',
-                  margin: '0 0 20px',
+                  fontWeight: 500,
+                  fontSize: 13,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: '#0a0a0a',
+                  margin: '0 0 28px',
                   textAlign: 'center',
                 }}
               >
                 {group.title}
               </h3>
             </FadeItem>
-            <FadeItem>
+            <FadeItem style={{ width: '100%' }}>
               <div
+                className="team-grid"
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                  gap: 20,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  gap: '32px 28px',
+                  width: '100%',
                 }}
               >
                 {group.members.map((m, i) => (
@@ -332,6 +339,14 @@ export default function TeamSection() {
             </FadeItem>
           </FadeStagger>
         ))}
+
+        <style>{`
+          @media (max-width: 560px) {
+            .team-grid {
+              gap: 28px 20px !important;
+            }
+          }
+        `}</style>
       </div>
     </section>
   )

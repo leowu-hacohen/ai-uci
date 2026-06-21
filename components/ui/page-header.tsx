@@ -14,7 +14,7 @@ export default function PageHeader({ eyebrow, title, body }: PageHeaderProps) {
         style={{
           maxWidth: 720,
           margin: '0 auto',
-          padding: '48px clamp(24px, 5vw, 64px) 64px',
+          padding: '40px clamp(24px, 5vw, 64px) 28px',
           textAlign: 'center',
         }}
       >

@@ -61,7 +61,11 @@ export function AiUciHero({ className = '' }: { className?: string }) {
     const mouse = { x: -9999, y: -9999 }
     const parallax = { x: 0, y: 0 }
     let animId = 0
+    let lastSubAlpha = 0
     const startTime = performance.now()
+
+    type HitRegion = { id: string; x: number; y: number; w: number; h: number }
+    const hitRegions: HitRegion[] = []
 
     // ── Network drawing ───────────────────────────────────────────────────────
     // `alpha` (0..1) scales every stroke/fill so the entire net can fade in
@@ -185,8 +189,10 @@ export function AiUciHero({ className = '' }: { className?: string }) {
 
       // 3. Subtext
       if (subAlpha > 0) {
+        hitRegions.length = 0
         ctx.save()
         ctx.globalAlpha = subAlpha
+        lastSubAlpha = subAlpha
         const subFontSize = fontSize * 0.28
         const subLineH    = subFontSize * 1.55
         const subBaseX    = W * 0.19 + subOX
@@ -210,8 +216,15 @@ export function AiUciHero({ className = '' }: { className?: string }) {
             const tw = ctx.measureText(part).width
             if (!isSpace && sx + tw > subBaseX + maxSubW && sx > subBaseX) { sx = subBaseX; sy += subLineH }
             if (isSpace && sx === subBaseX) continue
+            const wordX = sx
             ctx.fillStyle = isBlue ? '#4a8fd4' : '#0a0a0a'
             ctx.fillText(part, sx, sy)
+            if (
+              isBlue &&
+              (part === 'learning' || part === 'projects' || part === 'community')
+            ) {
+              hitRegions.push({ id: part, x: wordX, y: sy, w: tw, h: subLineH })
+            }
             sx += tw
           }
         }
@@ -233,12 +246,68 @@ export function AiUciHero({ className = '' }: { className?: string }) {
       animId = requestAnimationFrame(animate)
     }
 
-    function onMouseMove(e: MouseEvent) { mouse.x = e.clientX; mouse.y = e.clientY }
-    function onMouseLeave() { mouse.x = -9999; mouse.y = -9999 }
+    function onWindowMouseMove(e: MouseEvent) {
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+    }
+
+    function onWindowMouseLeave() {
+      mouse.x = -9999
+      mouse.y = -9999
+    }
+
+    function scrollToPillar(id: string) {
+      const target = document.getElementById(id)
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    function pointInRegions(x: number, y: number) {
+      for (const r of hitRegions) {
+        if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return r.id
+      }
+      return null
+    }
+
+    function canvasPoint(e: MouseEvent | Touch) {
+      const rect = el.getBoundingClientRect()
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top }
+    }
+
+    function onCanvasMouseMove(e: MouseEvent) {
+      if (lastSubAlpha < 0.5) {
+        el.style.cursor = ''
+        return
+      }
+      const { x, y } = canvasPoint(e)
+      el.style.cursor = pointInRegions(x, y) ? 'pointer' : ''
+    }
+
+    function onCanvasMouseLeave() {
+      el.style.cursor = ''
+    }
+
+    function onClick(e: MouseEvent) {
+      if (lastSubAlpha < 0.5) return
+      const { x, y } = canvasPoint(e)
+      const id = pointInRegions(x, y)
+      if (id) scrollToPillar(id)
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (lastSubAlpha < 0.5 || e.changedTouches.length === 0) return
+      const { x, y } = canvasPoint(e.changedTouches[0])
+      const id = pointInRegions(x, y)
+      if (id) scrollToPillar(id)
+    }
+
     function onResize() { resize() }
 
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseleave', onMouseLeave)
+    window.addEventListener('mousemove', onWindowMouseMove)
+    window.addEventListener('mouseleave', onWindowMouseLeave)
+    el.addEventListener('mousemove', onCanvasMouseMove)
+    el.addEventListener('mouseleave', onCanvasMouseLeave)
+    el.addEventListener('click', onClick)
+    el.addEventListener('touchend', onTouchEnd)
     window.addEventListener('resize', onResize)
 
     document.fonts.load(`400 64px Redaction50`).catch(() => {})
@@ -247,8 +316,12 @@ export function AiUciHero({ className = '' }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(animId)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseleave', onMouseLeave)
+      window.removeEventListener('mousemove', onWindowMouseMove)
+      window.removeEventListener('mouseleave', onWindowMouseLeave)
+      el.removeEventListener('mousemove', onCanvasMouseMove)
+      el.removeEventListener('mouseleave', onCanvasMouseLeave)
+      el.removeEventListener('click', onClick)
+      el.removeEventListener('touchend', onTouchEnd)
       window.removeEventListener('resize', onResize)
     }
   }, [])

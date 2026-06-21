@@ -1,6 +1,7 @@
 'use client'
 import Navbar from './navbar'
 import CustomCursor from './custom-cursor'
+import SiteFooter from './site-footer'
 
 export default function PageShell({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +17,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
+      <SiteFooter />
     </>
   )
 }

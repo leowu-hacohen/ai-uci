@@ -7,6 +7,7 @@ const SPRING = { mass: 0.08, stiffness: 380, damping: 28 }
 
 export default function CustomCursor() {
   const [label, setLabel]       = useState<string | null>(null)
+  const [hovered, setHovered]   = useState(false)
   const [hasMoved, setHasMoved] = useState(false)
   const [active, setActive]     = useState(false)
 
@@ -24,8 +25,10 @@ export default function CustomCursor() {
       my.set(e.clientY)
       setHasMoved(true)
 
-      const el = (e.target as HTMLElement).closest('[data-cursor-label]')
-      setLabel(el ? el.getAttribute('data-cursor-label') : null)
+      const labelEl = (e.target as HTMLElement).closest('[data-cursor-label]')
+      const hoverEl = (e.target as HTMLElement).closest('[data-cursor-hover]')
+      setLabel(labelEl ? labelEl.getAttribute('data-cursor-label') : null)
+      setHovered(!labelEl && hoverEl !== null)
     }
 
     window.addEventListener('mousemove', onMove, { passive: true })
@@ -68,16 +71,19 @@ export default function CustomCursor() {
           <motion.div
             key="dot"
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: hasMoved ? 1 : 0, scale: 1 }}
+            animate={{
+              opacity: hasMoved ? 1 : 0,
+              scale: hovered ? 1.35 : 1,
+              width: hovered ? 13 : 9,
+              height: hovered ? 13 : 9,
+            }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.12 }}
             style={{
               translateX: '-50%',
               translateY: '-50%',
-              width: 9,
-              height: 9,
               borderRadius: '50%',
-              background: '#0a0a0a',
+              background: hovered ? '#4a8fd4' : '#0a0a0a',
             }}
           />
         )}

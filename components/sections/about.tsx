@@ -1,6 +1,7 @@
 'use client'
-import { motion, useReducedMotion } from 'framer-motion'
-import { FadeStagger, FadeItem, FadeUp } from '@/components/ui/motion-primitives'
+import Link from 'next/link'
+import { FadeStagger, FadeItem, FadeUp, RevealFanPhoto, ScrollParallax, REVEAL_EASE, REVEAL_VIEWPORT } from '@/components/ui/motion-primitives'
+import { motion } from 'framer-motion'
 
 // Shared meeting-info copy (Schedule imports MEETING_INFO_SHORT)
 export const MEETING_INFO_COPY =
@@ -19,7 +20,7 @@ function LearningIcon() {
     <img
       src="/images/icons/brain.png"
       alt="Learning"
-      style={{ height: PILLAR_ICON_HEIGHT, width: 'auto', objectFit: 'contain' }}
+      style={{ height: PILLAR_ICON_HEIGHT, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
     />
   )
 }
@@ -29,7 +30,7 @@ function CommunityIcon() {
     <img
       src="/images/icons/handshake.png"
       alt="Community"
-      style={{ height: PILLAR_ICON_HEIGHT, width: 'auto', objectFit: 'contain' }}
+      style={{ height: 80, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
     />
   )
 }
@@ -39,7 +40,7 @@ function ProjectsIcon() {
     <img
       src="/images/icons/rocket.png"
       alt="Projects"
-      style={{ height: PILLAR_ICON_HEIGHT, width: 'auto', objectFit: 'contain' }}
+      style={{ height: 128, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
     />
   )
 }
@@ -66,14 +67,45 @@ type PillarProps = {
   title: string
   body: string
   stagger?: number
+  // Projects pillar: events CTA row shares the same 3-column grid below the main row.
+  eventsExtension?: boolean
 }
 
-// Shared section grid — matches CONTENT_MAX used by every other section so
-// the pillar row sits flush with the rest of the site grid.
+// Shared pillar row width — matches the wide What We Provide layout.
 const PILLAR_ROW_MAX = 1200
 const PILLAR_PHOTO_MAX = 360
+// Fixed icon track so brain / handshake / rocket share the same vertical axis.
+const PILLAR_ICON_COL = 128
 
-function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
+const EVENTS_CTA_BODY =
+  'Workshops every week, speakers from industry, and the events that fill the room.'
+
+function EventsCtaArrow() {
+  return (
+    <motion.img
+      className="events-cta-arrow"
+      src="/images/events-cta-arrow.png"
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      initial={{ opacity: 0, x: -10, scaleY: -1 }}
+      whileInView={{ opacity: 1, x: 0, scaleY: -1 }}
+      viewport={REVEAL_VIEWPORT}
+      transition={{ duration: 0.7, delay: 0, ease: REVEAL_EASE }}
+      style={{
+        position: 'absolute',
+        right: 'calc(100% + 18px)',
+        top: '-46px',
+        width: 100,
+        height: 'auto',
+        pointerEvents: 'none',
+        transformOrigin: 'center center',
+      }}
+    />
+  )
+}
+
+function Pillar({ id, photo, icon, title, body, stagger = 0, eventsExtension = false }: PillarProps) {
   return (
     <div id={id} style={{ scrollMarginTop: 96 }}>
       <FadeStagger
@@ -90,7 +122,7 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
             // icon hugs its intrinsic width. minmax(0, …) on the copy track
             // is critical — without it long body copy can blow out the row
             // width and break the uniform widths across pillars.
-            gridTemplateColumns: `${PILLAR_PHOTO_MAX}px minmax(0, 1fr) auto`,
+            gridTemplateColumns: `${PILLAR_PHOTO_MAX}px minmax(0, 1fr) ${PILLAR_ICON_COL}px`,
             alignItems: 'start',
             columnGap: 56,
             maxWidth: PILLAR_ROW_MAX,
@@ -98,7 +130,7 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
           }}
         >
           {/* LEFT — photo */}
-          <FadeItem>
+          <FadeItem duration={0.85}>
             <div
               style={{
                 width: '100%',
@@ -110,12 +142,16 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
                 boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
               }}
             >
-              <img
+              <motion.img
                 src={photo.src}
                 alt={photo.alt}
                 loading="lazy"
                 decoding="async"
                 draggable={false}
+                initial={{ scale: 1.06 }}
+                whileInView={{ scale: 1 }}
+                viewport={REVEAL_VIEWPORT}
+                transition={{ duration: 0.9, ease: REVEAL_EASE }}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -151,12 +187,13 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
             </FadeItem>
           </div>
 
-          {/* RIGHT — icon, top-aligned with the pill label */}
+          {/* RIGHT — icon, centered in fixed column for vertical-axis symmetry */}
           <FadeItem>
             <div
               style={{
+                width: PILLAR_ICON_COL,
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'center',
                 alignItems: 'flex-start',
               }}
             >
@@ -164,6 +201,124 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
             </div>
           </FadeItem>
         </div>
+
+        {eventsExtension && (
+          <div
+            className="pillar-events-row"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: 48,
+              padding: '28px 0',
+              maxWidth: PILLAR_ROW_MAX,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            <div
+              className="pillar-events-inner"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 49,
+              }}
+            >
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <EventsCtaArrow />
+                <motion.div
+                  initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={REVEAL_VIEWPORT}
+                  transition={{ duration: 0.75, delay: 0.22, ease: REVEAL_EASE }}
+                >
+                  <Link
+                    href="/events"
+                    data-cursor-hover=""
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      marginLeft: 28,
+                      padding: '26px 37px',
+                      minHeight: 73,
+                      background: '#4a8fd4',
+                      color: '#ffffff',
+                      borderRadius: 9999,
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontWeight: 500,
+                      fontSize: 20,
+                      letterSpacing: '0.01em',
+                      textDecoration: 'none',
+                      transition: 'background 150ms ease',
+                      boxSizing: 'border-box',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={e => {
+                      ;(e.currentTarget as HTMLElement).style.background = '#3a7fc4'
+                    }}
+                    onMouseLeave={e => {
+                      ;(e.currentTarget as HTMLElement).style.background = '#4a8fd4'
+                    }}
+                  >
+                    Check out our events
+                  </Link>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={REVEAL_VIEWPORT}
+                transition={{ duration: 0.75, delay: 0.38, ease: REVEAL_EASE }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: 14,
+                  maxWidth: 428,
+                  marginLeft: 28,
+                }}
+              >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                    }}
+                  >
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="16" rx="2" stroke="#4a8fd4" strokeWidth="2" />
+                      <line x1="3" y1="10" x2="21" y2="10" stroke="#4a8fd4" strokeWidth="2" />
+                      <line x1="8" y1="3" x2="8" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
+                      <line x1="16" y1="3" x2="16" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span
+                      style={{
+                        fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                        fontSize: 17,
+                        color: 'rgba(74,143,212,0.85)',
+                      }}
+                    >
+                      {MEETING_INFO_SHORT}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 20,
+                      lineHeight: 1.55,
+                      color: 'rgba(10,10,10,0.65)',
+                      margin: 0,
+                      textAlign: 'left',
+                    }}
+                  >
+                    {EVENTS_CTA_BODY}
+                  </p>
+              </motion.div>
+            </div>
+          </div>
+        )}
 
         {/* Responsive: stack photo → text → icon vertically on narrow screens
             so the photo never gets crushed into a third of the viewport. */}
@@ -177,6 +332,29 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
             .pillar-row > *:last-child {
               justify-content: flex-start !important;
             }
+            .pillar-events-row {
+              padding-left: 0 !important;
+              padding-right: 0 !important;
+            }
+            .pillar-events-inner {
+              flex-direction: column !important;
+              align-items: center !important;
+              text-align: center !important;
+            }
+            .pillar-events-inner a[href="/events"] {
+              margin-left: 0 !important;
+            }
+            .pillar-events-inner > div:last-child {
+              align-items: center !important;
+              max-width: none !important;
+              margin-left: 0 !important;
+            }
+            .pillar-events-inner p {
+              text-align: center !important;
+            }
+            .events-cta-arrow {
+              display: none !important;
+            }
           }
         `}</style>
       </FadeStagger>
@@ -186,7 +364,6 @@ function Pillar({ id, photo, icon, title, body, stagger = 0 }: PillarProps) {
 
 // ── Who We Are block ─────────────────────────────────────────────────────────
 function WhoWeAre() {
-  const reduce = useReducedMotion()
   // Photos are fan-stacked inside a square right-column container. `width` is
   // the percentage of the container each card spans; `top`/`left` are the
   // un-rotated anchor. Sized so the rotated bounding boxes of all three stay
@@ -287,7 +464,7 @@ function WhoWeAre() {
       </div>
 
       {/* Right column: fanned photo stack — each card fades + rotates into place */}
-      <div
+      <ScrollParallax
         className="who-we-are-photos"
         style={{
           position: 'relative',
@@ -295,41 +472,29 @@ function WhoWeAre() {
           aspectRatio: '1 / 1',
           minHeight: 380,
         }}
+        yOffset={36}
       >
-        {photos.map((p, i) => {
-          const initial = reduce
-            ? false
-            : { opacity: 0, scale: 0.92, rotate: 0 }
-          const target = { opacity: 1, scale: 1, rotate: parseFloat(p.rotate) }
-          return (
-            <motion.img
-              key={i}
-              src={p.src}
-              alt={p.alt}
-              initial={initial}
-              whileInView={target}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.25 + i * 0.12,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              style={{
-                position: 'absolute',
-                top: p.top,
-                left: p.left,
-                width: p.width,
-                aspectRatio: '4 / 3',
-                objectFit: 'cover',
-                borderRadius: 12,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                zIndex: p.z,
-                transformOrigin: 'center center',
-              }}
-            />
-          )
-        })}
-      </div>
+        {photos.map((p, i) => (
+          <RevealFanPhoto
+            key={i}
+            src={p.src}
+            alt={p.alt}
+            index={i}
+            rotate={p.rotate}
+            style={{
+              position: 'absolute',
+              top: p.top,
+              left: p.left,
+              width: p.width,
+              aspectRatio: '4 / 3',
+              objectFit: 'cover',
+              borderRadius: 12,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              zIndex: p.z,
+            }}
+          />
+        ))}
+      </ScrollParallax>
 
       {/* Responsive: stack columns and let photos fill the row on small screens. */}
       <style>{`
@@ -387,7 +552,7 @@ export default function AboutSection() {
         scrollMarginTop: 96,
         // Unified site-wide horizontal gutter (matches Team, Schedule).
         // Vertical rhythm: 96px on all major sections.
-        padding: '96px clamp(24px, 5vw, 64px)',
+        padding: '96px clamp(24px, 5vw, 64px) 24px',
         overflow: 'hidden',
       }}
     >
@@ -443,6 +608,7 @@ export default function AboutSection() {
           title="Projects"
           body="CACTUS, Winter Quarter Project, AWS CloudHacks 2026. These aren't school assignments with a rubric. They're real projects with real timelines, built by small teams who actually care about the outcome. The kind of thing you can pull up in an interview and walk someone through start to finish."
           stagger={0.2}
+          eventsExtension
         />
       </div>
     </section>

@@ -13,11 +13,10 @@ import {
 import { FadeStagger, FadeItem } from './motion-primitives'
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '/' },
   { label: 'About',    href: '/about' },
   { label: 'Events',   href: '/events' },
   { label: 'Projects', href: '/projects' },
-  { label: 'Join',     href: '/join' },
+  { label: 'Join',     href: '/join', cta: true },
 ]
 
 function scrollToTop() {
@@ -88,12 +87,27 @@ export default function Navbar() {
     textTransform: 'capitalize' as const,
   }
 
-  const linkStyle = (active: boolean): React.CSSProperties => ({
-    ...pillStyle,
-    borderColor: active ? 'rgba(74,143,212,0.45)' : 'rgba(0,0,0,0.10)',
-    color: active ? '#4a8fd4' : '#0a0a0a',
-    textDecoration: 'none',
-  })
+  const linkStyle = (active: boolean, cta = false): React.CSSProperties => {
+    if (cta) {
+      return {
+        ...pillStyle,
+        marginLeft: 4,
+        padding: '8px 20px',
+        background: active ? '#3a7fc4' : '#4a8fd4',
+        border: '1px solid transparent',
+        color: '#ffffff',
+        textDecoration: 'none',
+        boxShadow: '0 2px 12px rgba(74,143,212,0.28)',
+        transition: 'background 150ms ease, box-shadow 150ms ease',
+      }
+    }
+    return {
+      ...pillStyle,
+      borderColor: active ? 'rgba(74,143,212,0.45)' : 'rgba(0,0,0,0.10)',
+      color: active ? '#4a8fd4' : '#0a0a0a',
+      textDecoration: 'none',
+    }
+  }
 
   const handleLogoClick = (e: React.MouseEvent) => {
     if (pathname === '/') {
@@ -144,6 +158,7 @@ export default function Navbar() {
                 href="/"
                 onClick={handleLogoClick}
                 aria-label="Home"
+                data-cursor-hover=""
                 style={{
                   background: 'none',
                   border: 'none',
@@ -172,19 +187,29 @@ export default function Navbar() {
             stagger={0.07}
             style={{ display: 'flex', gap: 6, alignItems: 'center' }}
           >
-            {NAV_LINKS.map(l => (
+            {NAV_LINKS.map(l => {
+              const active = isActive(l.href)
+              const cta = 'cta' in l && l.cta
+              return (
               <FadeItem key={l.label}>
                 <Link
                   href={l.href}
-                  style={linkStyle(isActive(l.href))}
+                  data-cursor-hover={cta ? '' : undefined}
+                  style={linkStyle(active, cta)}
                   onMouseEnter={e => {
-                    if (!isActive(l.href)) {
+                    if (cta) {
+                      e.currentTarget.style.background = '#3a7fc4'
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(74,143,212,0.35)'
+                    } else if (!active) {
                       e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
                       e.currentTarget.style.color = '#4a8fd4'
                     }
                   }}
                   onMouseLeave={e => {
-                    if (!isActive(l.href)) {
+                    if (cta) {
+                      e.currentTarget.style.background = active ? '#3a7fc4' : '#4a8fd4'
+                      e.currentTarget.style.boxShadow = '0 2px 12px rgba(74,143,212,0.28)'
+                    } else if (!active) {
                       e.currentTarget.style.borderColor = 'rgba(0,0,0,0.10)'
                       e.currentTarget.style.color = '#0a0a0a'
                     }
@@ -193,7 +218,8 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               </FadeItem>
-            ))}
+              )
+            })}
           </FadeStagger>
         </motion.div>
       </motion.nav>
@@ -213,6 +239,7 @@ export default function Navbar() {
           href="/"
           onClick={handleLogoClick}
           aria-label="Home"
+          data-cursor-hover=""
           style={{
             background: 'none',
             border: 'none',
@@ -245,25 +272,44 @@ export default function Navbar() {
           display: 'flex', flexDirection: 'column', padding: '12px 20px 20px',
           gap: 4,
         }}>
-          {NAV_LINKS.map(l => (
+          {NAV_LINKS.map(l => {
+            const active = isActive(l.href)
+            const cta = 'cta' in l && l.cta
+            return (
             <Link
               key={l.label}
               href={l.href}
               onClick={() => setOpen(false)}
-              style={{
-                fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 15,
-                fontWeight: isActive(l.href) ? 500 : 400,
-                color: isActive(l.href) ? '#4a8fd4' : '#0a0a0a',
-                textAlign: 'left',
-                padding: '11px 0',
-                borderBottom: '1px solid rgba(0,0,0,0.06)',
-                textDecoration: 'none',
-              }}
+              style={
+                cta
+                  ? {
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 15,
+                      fontWeight: 500,
+                      color: '#ffffff',
+                      textAlign: 'center',
+                      padding: '12px 20px',
+                      marginTop: 8,
+                      borderRadius: 9999,
+                      background: active ? '#3a7fc4' : '#4a8fd4',
+                      textDecoration: 'none',
+                    }
+                  : {
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 15,
+                      fontWeight: active ? 500 : 400,
+                      color: active ? '#4a8fd4' : '#0a0a0a',
+                      textAlign: 'left',
+                      padding: '11px 0',
+                      borderBottom: '1px solid rgba(0,0,0,0.06)',
+                      textDecoration: 'none',
+                    }
+              }
             >
               {l.label}
             </Link>
-          ))}
+            )
+          })}
         </div>
       )}
     </>

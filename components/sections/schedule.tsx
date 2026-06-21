@@ -17,7 +17,7 @@ export default function ScheduleSection() {
   return (
     <section
       id="schedule"
-      style={{ background: '#ffffff', padding: '96px clamp(24px, 5vw, 64px) 128px' }}
+      style={{ background: '#ffffff', padding: '40px clamp(24px, 5vw, 64px) 128px' }}
     >
       <FadeStagger
         stagger={0.09}
@@ -29,7 +29,7 @@ export default function ScheduleSection() {
             style={{
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
               fontWeight: 400,
-              fontSize: 26,
+              fontSize: 31,
               color: '#0a0a0a',
               margin: 0,
             }}
@@ -41,11 +41,11 @@ export default function ScheduleSection() {
           <h2
             style={{
               fontFamily: 'Redaction50, Georgia, serif',
-              fontSize: 'clamp(36px, 5vw, 56px)',
+              fontSize: 'clamp(43px, 6vw, 67px)',
               lineHeight: 1.1,
               color: '#0a0a0a',
               fontWeight: 400,
-              margin: '16px 0 24px',
+              margin: '19px 0 29px',
             }}
           >
             See what&apos;s coming.
@@ -55,11 +55,11 @@ export default function ScheduleSection() {
           <p
             style={{
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-              fontSize: 16,
+              fontSize: 19,
               lineHeight: 1.6,
               color: 'rgba(10,10,10,0.7)',
-              margin: '0 auto 48px',
-              maxWidth: 520,
+              margin: '0 auto 58px',
+              maxWidth: 624,
             }}
           >
             Drop your email, follow on Instagram, or just show up Wednesday.
@@ -72,8 +72,8 @@ export default function ScheduleSection() {
             onSubmit={handleSubmit}
             style={{
               display: 'flex',
-              gap: 12,
-              maxWidth: 480,
+              gap: 14,
+              maxWidth: 576,
               margin: '0 auto',
               flexWrap: 'wrap',
               justifyContent: 'center',
@@ -86,15 +86,15 @@ export default function ScheduleSection() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               style={{
-                flex: '1 1 240px',
-                padding: '14px 20px',
+                flex: '1 1 288px',
+                padding: '17px 24px',
                 background: '#f8f9fc',
                 border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 9999,
                 color: '#0a0a0a',
                 outline: 'none',
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 14,
+                fontSize: 17,
                 minWidth: 0,
               }}
               onFocus={e => {
@@ -106,15 +106,16 @@ export default function ScheduleSection() {
             />
             <button
               type="submit"
+              data-cursor-hover=""
               style={{
-                padding: '14px 28px',
+                padding: '17px 34px',
                 background: '#4a8fd4',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: 9999,
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
                 fontWeight: 500,
-                fontSize: 14,
+                fontSize: 17,
                 cursor: 'pointer',
                 letterSpacing: '0.04em',
               }}
@@ -127,26 +128,26 @@ export default function ScheduleSection() {
           <FadeItem>
             <div
               style={{
-                maxWidth: 520,
+                maxWidth: 624,
                 margin: '0 auto',
-                padding: '20px 24px',
+                padding: '24px 29px',
                 background: 'rgba(74,143,212,0.08)',
                 border: '1px solid rgba(74,143,212,0.3)',
                 borderRadius: 16,
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 15,
+                fontSize: 18,
                 lineHeight: 1.6,
                 color: '#0a0a0a',
               }}
             >
               Thanks. We&apos;ll have signups live soon. For now, follow{' '}
               <a
-                href="https://instagram.com/aiuci"
+                href="https://instagram.com/aiatuci"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: '#4a8fd4', textDecoration: 'underline' }}
               >
-                @aiuci
+                @aiatuci
               </a>{' '}
               on Instagram or show up Wednesday at 4–5:30pm in DBH 6011.
             </div>
@@ -154,30 +155,30 @@ export default function ScheduleSection() {
         )}
 
         <FadeItem>
-          <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
+          <div style={{ marginTop: 58, display: 'flex', flexDirection: 'column', gap: 19, alignItems: 'center' }}>
             <a
-              href="https://instagram.com/aiuci"
+              href="https://instagram.com/aiatuci"
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 10,
                 color: '#4a8fd4',
                 textDecoration: 'none',
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 14,
+                fontSize: 17,
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="3" y="3" width="18" height="18" rx="5" stroke="#4a8fd4" strokeWidth="2" />
                 <circle cx="12" cy="12" r="4" stroke="#4a8fd4" strokeWidth="2" />
                 <circle cx="17.5" cy="6.5" r="1.2" fill="#4a8fd4" />
               </svg>
-              <span>@aiuci</span>
+              <span>@aiatuci</span>
             </a>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="16" rx="2" stroke="#4a8fd4" strokeWidth="2" />
                 <line x1="3" y1="10" x2="21" y2="10" stroke="#4a8fd4" strokeWidth="2" />
                 <line x1="8" y1="3" x2="8" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
@@ -186,7 +187,7 @@ export default function ScheduleSection() {
               <span
                 style={{
                   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                  fontSize: 14,
+                  fontSize: 17,
                   color: 'rgba(74,143,212,0.8)',
                 }}
               >

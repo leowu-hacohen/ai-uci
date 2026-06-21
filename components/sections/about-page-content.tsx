@@ -1,6 +1,5 @@
 'use client'
-import { motion, useReducedMotion } from 'framer-motion'
-import { FadeStagger, FadeItem, FadeUp } from '@/components/ui/motion-primitives'
+import { FadeStagger, FadeItem, FadeUp, RevealFanPhoto, ScrollParallax } from '@/components/ui/motion-primitives'
 import TeamSection from './team'
 
 const BODY_STYLE: React.CSSProperties = {
@@ -41,6 +40,25 @@ const photos = [
   },
 ]
 
+const ADVISORS = [
+  {
+    name: 'Alexander Ihler',
+    role: 'Professor of Computer Science',
+    image: '/images/advisors/ihler.png',
+    alt: 'Alexander Ihler portrait',
+    bio:
+      'Ihler conducts research in artificial intelligence and machine learning, focusing on statistical methods for learning from data and on approximate inference techniques for graphical models. Applications of his work includes data mining and information fusion in sensor networks, computer vision and image processing, and computational biology.',
+  },
+  {
+    name: 'Stephan Mandt',
+    role: 'Associate Professor of CS & Statistics',
+    image: '/images/advisors/mandt.png',
+    alt: 'Stephan Mandt portrait',
+    bio:
+      'Stephan Mandt is an Associate Professor of Computer Science and Statistics at the University of California, Irvine, where he leads research at the intersection of deep generative modeling, uncertainty quantification, neural data compression, and AI for science. His work advances the foundations and applications of generative AI, with a particular focus on resource-efficient learning and inference algorithms, as well as AI-driven scientific discovery.',
+  },
+]
+
 function Stat({ number, label }: { number: string; label: string }) {
   return (
     <div>
@@ -71,22 +89,20 @@ function Stat({ number, label }: { number: string; label: string }) {
 }
 
 export default function AboutPageContent() {
-  const reduce = useReducedMotion()
-
   return (
     <>
-      <section style={{ padding: '0 clamp(24px, 5vw, 64px) 80px' }}>
+      <section style={{ padding: '8px clamp(24px, 5vw, 64px) 28px' }}>
         <FadeStagger
           stagger={0.1}
           amount={0.2}
           className="about-intro"
           style={{
-            maxWidth: 1200,
+            maxWidth: 1040,
             margin: '0 auto',
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 64,
-            alignItems: 'center',
+            gridTemplateColumns: 'minmax(0, 1fr) minmax(240px, 340px)',
+            gap: 40,
+            alignItems: 'start',
           }}
         >
           <div>
@@ -114,58 +130,51 @@ export default function AboutPageContent() {
             </FadeItem>
           </div>
 
-          <div
+          <ScrollParallax
             className="about-intro-photos"
             style={{
               position: 'relative',
               width: '100%',
-              aspectRatio: '1 / 1',
-              minHeight: 320,
+              maxWidth: 340,
+              marginRight: 'auto',
+              aspectRatio: '4 / 3',
             }}
+            yOffset={24}
           >
-            {photos.map((p, i) => {
-              const initial = reduce ? false : { opacity: 0, scale: 0.92, rotate: 0 }
-              const target = { opacity: 1, scale: 1, rotate: parseFloat(p.rotate) }
-              return (
-                <motion.img
-                  key={i}
-                  src={p.src}
-                  alt={p.alt}
-                  initial={initial}
-                  whileInView={target}
-                  viewport={{ once: true, amount: 0.25 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.15 + i * 0.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  style={{
-                    position: 'absolute',
-                    top: p.top,
-                    left: p.left,
-                    width: p.width,
-                    aspectRatio: '4 / 3',
-                    objectFit: 'cover',
-                    borderRadius: 12,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    zIndex: p.z,
-                    transformOrigin: 'center center',
-                  }}
-                />
-              )
-            })}
-          </div>
+            {photos.map((p, i) => (
+              <RevealFanPhoto
+                key={i}
+                src={p.src}
+                alt={p.alt}
+                index={i}
+                rotate={p.rotate}
+                style={{
+                  position: 'absolute',
+                  top: p.top,
+                  left: p.left,
+                  width: p.width,
+                  aspectRatio: '4 / 3',
+                  objectFit: 'cover',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  zIndex: p.z,
+                }}
+              />
+            ))}
+          </ScrollParallax>
         </FadeStagger>
 
         <style>{`
           @media (max-width: 768px) {
             .about-intro {
               grid-template-columns: 1fr !important;
-              gap: 40px !important;
+              gap: 36px !important;
+              max-width: 640px !important;
             }
             .about-intro-photos {
+              max-width: 100% !important;
+              margin-right: 0 !important;
               aspect-ratio: 4 / 3 !important;
-              min-height: 280px !important;
             }
           }
         `}</style>
@@ -173,7 +182,7 @@ export default function AboutPageContent() {
 
       <section
         style={{
-          padding: '0 clamp(24px, 5vw, 64px) 80px',
+          padding: '0 clamp(24px, 5vw, 64px) 56px',
           maxWidth: 800,
           margin: '0 auto',
         }}
@@ -202,8 +211,13 @@ export default function AboutPageContent() {
         </FadeUp>
       </section>
 
-      <section style={{ padding: '0 clamp(24px, 5vw, 64px) 48px' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+      <section
+        style={{
+          padding: '56px clamp(24px, 5vw, 64px) 72px',
+          background: '#f8f9fc',
+        }}
+      >
+        <div style={{ maxWidth: 880, margin: '0 auto' }}>
           <FadeUp amount={0.15}>
             <h2
               style={{
@@ -213,40 +227,120 @@ export default function AboutPageContent() {
                 color: '#0a0a0a',
                 fontWeight: 400,
                 margin: '0 0 12px',
+                textAlign: 'center',
               }}
             >
               Advisors
             </h2>
-            <p style={{ ...BODY_STYLE, margin: '0 0 32px' }}>
+            <p
+              style={{
+                ...BODY_STYLE,
+                margin: '0 auto 40px',
+                textAlign: 'center',
+                maxWidth: 520,
+              }}
+            >
               Faculty mentors who guide our direction and connect us to research across campus.
             </p>
           </FadeUp>
-          <FadeUp amount={0.15} delay={0.08}>
+
+          <FadeStagger stagger={0.1} amount={0.15}>
             <div
+              className="advisors-grid"
               style={{
-                padding: '40px 32px',
-                borderRadius: 16,
-                border: '0.5px solid rgba(0,0,0,0.08)',
-                background: '#f8f9fc',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: 20,
               }}
             >
-              <p
-                style={{
-                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                  fontSize: 15,
-                  color: 'rgba(10,10,10,0.55)',
-                  margin: 0,
-                }}
-              >
-                Advisor profiles coming soon. Reach out at{' '}
-                <a href="mailto:aiatuci@gmail.com" style={{ color: '#4a8fd4' }}>
-                  aiatuci@gmail.com
-                </a>{' '}
-                if you&apos;d like to connect.
-              </p>
+              {ADVISORS.map(advisor => (
+                <FadeItem key={advisor.name}>
+                  <article
+                    style={{
+                      background: '#ffffff',
+                      borderRadius: 16,
+                      padding: '28px 24px 24px',
+                      border: '0.5px solid rgba(0,0,0,0.06)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 112,
+                        height: 112,
+                        margin: '0 auto',
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        border: '0.5px solid rgba(0,0,0,0.06)',
+                        background: '#f4f5f8',
+                      }}
+                    >
+                      <img
+                        src={advisor.image}
+                        alt={advisor.alt}
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
+                    <h3
+                      style={{
+                        fontFamily: 'Redaction50, Georgia, serif',
+                        fontSize: 22,
+                        lineHeight: 1.15,
+                        color: '#0a0a0a',
+                        fontWeight: 400,
+                        margin: '16px 0 6px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {advisor.name}
+                    </h3>
+                    <p
+                      style={{
+                        fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                        fontSize: 12,
+                        lineHeight: 1.35,
+                        color: '#4a8fd4',
+                        margin: '0 0 14px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {advisor.role}
+                    </p>
+                    <p
+                      style={{
+                        ...BODY_STYLE,
+                        margin: 0,
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        textAlign: 'left',
+                      }}
+                    >
+                      {advisor.bio}
+                    </p>
+                  </article>
+                </FadeItem>
+              ))}
             </div>
-          </FadeUp>
+          </FadeStagger>
         </div>
+
+        <style>{`
+          @media (max-width: 680px) {
+            .advisors-grid {
+              grid-template-columns: 1fr !important;
+              max-width: 400px !important;
+              margin: 0 auto !important;
+            }
+          }
+        `}</style>
       </section>
 
       <TeamSection />

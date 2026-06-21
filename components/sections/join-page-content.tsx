@@ -160,6 +160,7 @@ export default function JoinPageContent() {
                 />
                 <button
                   type="submit"
+                  data-cursor-hover=""
                   style={{
                     padding: '14px 28px',
                     background: '#4a8fd4',
@@ -254,6 +255,7 @@ export default function JoinPageContent() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-cursor-hover=""
                     style={{
                       display: 'block',
                       padding: '16px 18px',

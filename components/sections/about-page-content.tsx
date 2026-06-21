@@ -43,7 +43,6 @@ const photos = [
 const ADVISORS = [
   {
     name: 'Alexander Ihler',
-    role: 'Professor of Computer Science',
     image: '/images/advisors/ihler.png',
     alt: 'Alexander Ihler portrait',
     bio:
@@ -51,7 +50,6 @@ const ADVISORS = [
   },
   {
     name: 'Stephan Mandt',
-    role: 'Associate Professor of CS & Statistics',
     image: '/images/advisors/mandt.png',
     alt: 'Stephan Mandt portrait',
     bio:
@@ -211,13 +209,8 @@ export default function AboutPageContent() {
         </FadeUp>
       </section>
 
-      <section
-        style={{
-          padding: '56px clamp(24px, 5vw, 64px) 72px',
-          background: '#f8f9fc',
-        }}
-      >
-        <div style={{ maxWidth: 880, margin: '0 auto' }}>
+      <section style={{ padding: '0 clamp(24px, 5vw, 64px) 64px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <FadeUp amount={0.15}>
             <h2
               style={{
@@ -244,35 +237,40 @@ export default function AboutPageContent() {
             </p>
           </FadeUp>
 
-          <FadeStagger stagger={0.1} amount={0.15}>
+          <FadeStagger stagger={0.12} amount={0.15}>
             <div
-              className="advisors-grid"
+              className="advisors-list"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                gap: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 32,
+                maxWidth: 680,
+                margin: '0 auto',
               }}
             >
-              {ADVISORS.map(advisor => (
+              {ADVISORS.map((advisor, i) => (
                 <FadeItem key={advisor.name}>
                   <article
+                    className="advisor-row"
                     style={{
-                      background: '#ffffff',
-                      borderRadius: 16,
-                      padding: '28px 24px 24px',
-                      border: '0.5px solid rgba(0,0,0,0.06)',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                      display: 'flex',
+                      gap: 24,
+                      alignItems: 'flex-start',
+                      paddingBottom: i < ADVISORS.length - 1 ? 32 : 0,
+                      borderBottom:
+                        i < ADVISORS.length - 1 ? '0.5px solid rgba(0,0,0,0.08)' : 'none',
                     }}
                   >
                     <div
                       style={{
-                        width: 112,
-                        height: 112,
-                        margin: '0 auto',
-                        borderRadius: 14,
+                        width: 96,
+                        height: 96,
+                        flexShrink: 0,
+                        borderRadius: 12,
                         overflow: 'hidden',
                         border: '0.5px solid rgba(0,0,0,0.06)',
                         background: '#f4f5f8',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                       }}
                     >
                       <img
@@ -289,42 +287,23 @@ export default function AboutPageContent() {
                         }}
                       />
                     </div>
-                    <h3
-                      style={{
-                        fontFamily: 'Redaction50, Georgia, serif',
-                        fontSize: 22,
-                        lineHeight: 1.15,
-                        color: '#0a0a0a',
-                        fontWeight: 400,
-                        margin: '16px 0 6px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {advisor.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                        fontSize: 12,
-                        lineHeight: 1.35,
-                        color: '#4a8fd4',
-                        margin: '0 0 14px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {advisor.role}
-                    </p>
-                    <p
-                      style={{
-                        ...BODY_STYLE,
-                        margin: 0,
-                        fontSize: 14,
-                        lineHeight: 1.6,
-                        textAlign: 'left',
-                      }}
-                    >
-                      {advisor.bio}
-                    </p>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h3
+                        style={{
+                          fontFamily: 'Redaction50, Georgia, serif',
+                          fontSize: 22,
+                          lineHeight: 1.15,
+                          color: '#0a0a0a',
+                          fontWeight: 400,
+                          margin: '0 0 8px',
+                        }}
+                      >
+                        {advisor.name}
+                      </h3>
+                      <p style={{ ...BODY_STYLE, margin: 0, fontSize: 15, lineHeight: 1.6 }}>
+                        {advisor.bio}
+                      </p>
+                    </div>
                   </article>
                 </FadeItem>
               ))}
@@ -333,11 +312,12 @@ export default function AboutPageContent() {
         </div>
 
         <style>{`
-          @media (max-width: 680px) {
-            .advisors-grid {
-              grid-template-columns: 1fr !important;
-              max-width: 400px !important;
-              margin: 0 auto !important;
+          @media (max-width: 560px) {
+            .advisor-row {
+              flex-direction: column !important;
+              align-items: center !important;
+              text-align: center !important;
+              gap: 16px !important;
             }
           }
         `}</style>

@@ -211,6 +211,18 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         ctx.restore()
       }
 
+      // 4. Gradient bridge — fade the bottom 120px of canvas to transparent (KTD1).
+      // Erases the canvas paint with a destination-out vertical gradient so the dark
+      // body bg shows through, smoothing the white→dark seam with the dark sections below.
+      ctx.save()
+      ctx.globalCompositeOperation = 'destination-out'
+      const bridge = ctx.createLinearGradient(0, H - 120, 0, H)
+      bridge.addColorStop(0, 'rgba(0,0,0,0)')
+      bridge.addColorStop(1, 'rgba(0,0,0,1)')
+      ctx.fillStyle = bridge
+      ctx.fillRect(0, H - 120, W, 120)
+      ctx.restore()
+
       animId = requestAnimationFrame(animate)
     }
 
@@ -238,7 +250,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
     <div
       id="home"
       className={`relative w-full ${className}`}
-      style={{ background: '#ffffff', height: '100svh' }}
+      style={{ background: 'transparent', height: '100svh' }}
     >
       <canvas ref={canvasRef} className="block w-full h-full" />
       <TickerBar />

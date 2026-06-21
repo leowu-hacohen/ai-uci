@@ -5,8 +5,8 @@
 const LOGOS = [
   { src: '/images/sponsors/claude.png',   alt: 'Claude',   h: 1.0  },
   { src: '/images/sponsors/cactus.png',   alt: 'Cactus',   h: 1.15 },
-  { src: '/images/sponsors/nvidia.png',   alt: 'NVIDIA',   h: 1.4  },
-  { src: '/images/sponsors/lovable.png',  alt: 'Lovable',  h: 1.35 },
+  { src: '/images/sponsors/nvidia.png',   alt: 'NVIDIA',   h: 2.0  },
+  { src: '/images/sponsors/lovable.png',  alt: 'Lovable',  h: 2.0  },
   { src: '/images/sponsors/supabase.png', alt: 'Supabase', h: 1.0  },
   { src: '/images/sponsors/sunstone.png', alt: 'Sunstone', h: 1.0  },
   { src: '/images/sponsors/aws.png',      alt: 'AWS',      h: 1.3  },
@@ -14,7 +14,7 @@ const LOGOS = [
 
 const BASE_HEIGHT = 32
 const SLOT_WIDTH = 200
-const SLOT_HEIGHT = 56
+const SLOT_HEIGHT = 72
 
 export default function TickerBar() {
   const items = [...LOGOS, ...LOGOS]
@@ -55,6 +55,7 @@ export default function TickerBar() {
         }}
       >
         <div
+          className="ticker-scroll-wrapper"
           style={{
             display: 'flex',
             width: 'max-content',

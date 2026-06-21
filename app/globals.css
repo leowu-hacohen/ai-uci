@@ -38,9 +38,17 @@
   font-display: swap;
 }
 
+/*
+ * PP Neue Montreal Medium (500) is intentionally NOT declared here.
+ * The Medium .otf is not available; per KTD5, pillar titles fall back to
+ * font-weight: 700 (Bold) at a smaller size — see components/sections/about.tsx.
+ * Do NOT use font-weight: 500 anywhere — browsers will silently match against
+ * the Book (400) file and the weight distinction will collapse.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #08090e;
+  --foreground: #f0f4ff;
 }
 
 @theme inline {
@@ -54,18 +62,37 @@ html {
   margin: 0;
   padding: 0;
   scroll-behavior: smooth;
+  /* Anchor jumps from the 64px fixed navbar land below it, not behind. */
+  scroll-padding-top: 80px;
 }
 
 body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background: #ffffff;
+  background: #08090e;
 }
 
 /* Hide default cursor — custom cursor takes over on fine-pointer devices */
 @media (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
+  /* Restore expected affordances for form + interactive elements
+   * so the I-beam and pointer cursors return where users expect them. */
+  input, textarea, select { cursor: auto !important; }
+  button, a, [role="button"] { cursor: pointer !important; }
+}
+
+/* Respect user motion preferences: pause CSS infinite animations entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-scroll-wrapper,
+  .carousel-scroll-wrapper {
+    animation: none !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 @keyframes scroll-left {

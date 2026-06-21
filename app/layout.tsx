@@ -13,8 +13,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI @ UCI",
-  description: "Artificial Intelligence at UC Irvine",
+  title: "Artificial Intelligence @ UCI",
+  description:
+    "Hands-on learning, real projects, and a community that builds together. Workshops, hackathons, and speakers at UC Irvine.",
+  openGraph: {
+    title: "Artificial Intelligence @ UCI",
+    description:
+      "Hands-on learning, real projects, and a community that builds together. Workshops, hackathons, and speakers at UC Irvine.",
+    images: ["/anteater-logo.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Artificial Intelligence @ UCI",
+    description:
+      "Hands-on learning, real projects, and a community that builds together. Workshops, hackathons, and speakers at UC Irvine.",
+    images: ["/anteater-logo.png"],
+  },
 };
 
 export default function RootLayout({

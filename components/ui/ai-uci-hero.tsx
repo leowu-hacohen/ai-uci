@@ -64,7 +64,10 @@ export function AiUciHero({ className = '' }: { className?: string }) {
     const startTime = performance.now()
 
     // ── Network drawing ───────────────────────────────────────────────────────
-    function drawNetwork() {
+    // `alpha` (0..1) scales every stroke/fill so the entire net can fade in
+    // alongside the text/logo intro instead of popping in at full opacity.
+    function drawNetwork(alpha: number) {
+      if (alpha <= 0) return
       const connDist = 160
       ctx.lineWidth = 0.7
       for (let i = 0; i < nodes.length; i++) {
@@ -73,7 +76,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
           const dy = nodes[i].y - nodes[j].y
           const d = Math.hypot(dx, dy)
           if (d < connDist) {
-            ctx.strokeStyle = `rgba(22,22,22,${(1 - d / connDist) * 0.38})`
+            ctx.strokeStyle = `rgba(22,22,22,${(1 - d / connDist) * 0.38 * alpha})`
             ctx.beginPath()
             ctx.moveTo(nodes[i].x, nodes[i].y)
             ctx.lineTo(nodes[j].x, nodes[j].y)
@@ -84,14 +87,14 @@ export function AiUciHero({ className = '' }: { className?: string }) {
       nodes.forEach(node => {
         if (node.r > 3.5) {
           const grad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.r * 3.5)
-          grad.addColorStop(0, 'rgba(30,30,30,0.22)')
+          grad.addColorStop(0, `rgba(30,30,30,${0.22 * alpha})`)
           grad.addColorStop(1, 'rgba(30,30,30,0)')
           ctx.fillStyle = grad
           ctx.beginPath()
           ctx.arc(node.x, node.y, node.r * 3.5, 0, Math.PI * 2)
           ctx.fill()
         }
-        ctx.fillStyle = 'rgba(18,18,18,0.88)'
+        ctx.fillStyle = `rgba(18,18,18,${0.88 * alpha})`
         ctx.beginPath()
         ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2)
         ctx.fill()
@@ -103,6 +106,10 @@ export function AiUciHero({ className = '' }: { className?: string }) {
       const now = performance.now()
       const elapsed = now - startTime
       const fade = (delay: number) => Math.min(1, Math.max(0, (elapsed - delay) / 350))
+      // Faster ramp for the ambient network so it materializes underneath the
+      // text intro without making the page look empty for ~half a second.
+      const fadeFast = (delay: number) => Math.min(1, Math.max(0, (elapsed - delay) / 250))
+      const netAlpha  = fadeFast(0)
       const headAlpha = fade(80)
       const logoAlpha = fade(260)
       const subAlpha  = fade(420)
@@ -137,7 +144,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         if (node.y > H - node.r) { node.y = H - node.r; node.vy = -Math.abs(node.vy) }
       })
 
-      drawNetwork()
+      drawNetwork(netAlpha)
 
       const fontSize = Math.min(84, W * 0.065)
       const lineH    = fontSize * 0.88

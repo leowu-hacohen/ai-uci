@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
+import { FadeStagger, FadeItem, FadeUp } from '@/components/ui/motion-primitives'
 
 // Shared meeting-info copy (Schedule imports the same string)
 export const MEETING_INFO_COPY =
@@ -10,15 +11,12 @@ export const MEETING_INFO_SHORT = 'Wednesdays · 4:00–5:30pm · DBH 6011'
 // ── Events deck (Pillar 1 carousel) ──────────────────────────────────────────
 type Event = { src: string; alt: string; name: string; date: string }
 const EVENTS: Event[] = [
-  { src: '/images/events/walle.jpg',     alt: 'Members at the WALL-E AI viewing event',     name: 'WALL-E AI Night',  date: '2024' },
-  { src: '/images/events/hope.jpg',      alt: 'Members at a community workshop',            name: 'Workshop',         date: '2024' },
-  { src: '/images/events/light.jpg',     alt: 'Members at an evening workshop',             name: 'Evening Workshop', date: '2024' },
-  { src: '/images/events/wires.jpg',     alt: 'Members hands-on at a hardware workshop',    name: 'Hardware Workshop', date: '2024' },
-  { src: '/images/events/pic01.jpg',     alt: 'AI @ UCI general meeting',                   name: 'General Meeting',  date: '2024' },
-  { src: '/images/events/pic02.jpg',     alt: 'AI @ UCI event attendees',                   name: 'Member Event',     date: '2024' },
-  { src: '/images/events/pic03.jpg',     alt: 'AI @ UCI workshop session',                  name: 'Workshop',         date: '2024' },
-  { src: '/images/events/pic04.jpg',     alt: 'AI @ UCI panel discussion',                  name: 'Industry Panel',   date: '2024' },
-  { src: '/images/events/pic05.jpg',     alt: 'AI @ UCI hackathon',                         name: 'Hackathon',        date: '2024' },
+  { src: '/images/events/learning-cloudhacks.png',   alt: 'Audience watching the AWS CloudHacks 2025 kickoff',     name: 'AWS CloudHacks',     date: '2025' },
+  { src: '/images/events/learning-aws-workshop.png', alt: 'Members working on laptops at an AWS workshop',         name: 'AWS Workshop',       date: '2025' },
+  { src: '/images/events/learning-racecar.png',      alt: 'RC racecar racing on an indoor track',                  name: 'RC Racing Workshop', date: '2025' },
+  { src: '/images/events/learning-aif.png',          alt: 'Officers tabling at the Anteater Involvement Fair',     name: 'Involvement Fair',   date: '2025' },
+  { src: '/images/events/learning-aif2.png',         alt: 'Crowd at the AI @ UCI booth at the Involvement Fair',   name: 'Involvement Fair',   date: '2025' },
+  { src: '/images/events/learning-officers.png',     alt: 'Two officers staffing the check-in desk',               name: 'Office Hours',       date: '2025' },
 ]
 
 // ── Speakers (Pillar 2 carousel) ─────────────────────────────────────────────
@@ -27,81 +25,143 @@ const EVENTS: Event[] = [
 type Speaker = { img: string; name: string; company: string; role: string; alt: string }
 const SPEAKERS: Speaker[] = []
 
+// ── Speaker lineup (mock schedule shown while SPEAKERS is empty) ─────────────
+// Visible only when SPEAKERS.length === 0. Treated as a design preview, not a
+// confirmed schedule — replace with real entries (or remove) once the lineup
+// is locked. Kept separate from SPEAKERS so the "real speakers only" rule
+// above is not violated.
+type LineupEntry = {
+  date: string
+  weekday: string
+  name: string
+  role: string
+  company: string
+  topic: string
+  abstract: string
+  location: string
+  time: string
+}
+const SPEAKER_LINEUP: LineupEntry[] = [
+  {
+    date: 'Oct 1', weekday: 'Wed',
+    name: 'Maya Chen', role: 'Research Engineer', company: 'Anthropic',
+    topic: 'Building Reliable Agents in Production',
+    abstract:
+      "What it actually takes to ship agents that don't break the first time a user does something unexpected. Real failures, real fixes, no demos.",
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Oct 8', weekday: 'Wed',
+    name: 'Devon Park', role: 'Founding Engineer', company: 'Perplexity',
+    topic: 'Search, Retrieval, and the End of the Ten Blue Links',
+    abstract:
+      'How retrieval became the new ranking, and why the search box may not survive the decade. Lessons from building a generative answer engine.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Oct 15', weekday: 'Wed',
+    name: 'Sofia Reyes', role: 'PhD Candidate', company: 'UC Irvine',
+    topic: 'Mechanistic Interpretability for Beginners',
+    abstract:
+      "A grad student's primer on opening up the black box. Attention heads, neurons, and circuits, without any prior background required.",
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Oct 22', weekday: 'Wed',
+    name: 'Jordan Mehta', role: 'Applied AI Lead', company: 'Stripe',
+    topic: 'ML for Fraud at Scale',
+    abstract:
+      'Fraud detection at billions of transactions per year, where every false positive costs revenue and every miss costs trust. Real architecture, real trade-offs.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Oct 29', weekday: 'Wed',
+    name: 'Priya Iyer', role: 'Solutions Architect', company: 'AWS',
+    topic: 'From Bedrock to Production',
+    abstract:
+      'From picking a model on Bedrock to keeping it alive in production: latency, cost, eval, and the things that bite you on week two.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Nov 5', weekday: 'Wed',
+    name: 'Alex Brennan', role: 'Co-founder', company: 'Stealth Startup',
+    topic: 'How to Build an AI Company in College',
+    abstract:
+      'Building a company while still in school. The unfair advantages, the things that will cost you, and how to know if it is worth dropping classes for.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Nov 12', weekday: 'Wed',
+    name: 'Nathaniel Wong', role: 'Staff ML Engineer', company: 'NVIDIA',
+    topic: 'CUDA, Triton, and the Kernel Layer',
+    abstract:
+      'Everyone talks about prompts. Almost nobody talks about the kernels. A look at the layer of the stack that decides whether your model is fast or just expensive.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Nov 19', weekday: 'Wed',
+    name: 'Riley Tanaka', role: 'Product Designer', company: 'Linear',
+    topic: 'Designing for Agents, Not Users',
+    abstract:
+      'Most product design is made for humans clicking buttons. When agents become the primary user, every assumption changes. A new design language is emerging.',
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Dec 3', weekday: 'Wed',
+    name: 'Hana Patel', role: 'Research Scientist', company: 'Google DeepMind',
+    topic: 'Reasoning Models and What Comes After RLHF',
+    abstract:
+      "Where reasoning models actually came from, what they're really doing under the hood, and the post-RLHF landscape. A research-track talk for builders.",
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+  {
+    date: 'Jan 14', weekday: 'Wed',
+    name: 'Marcus Holloway', role: 'CTO', company: 'Together AI',
+    topic: 'Open Models, Open Infra, Open Future',
+    abstract:
+      "Why the open model ecosystem matters, what's still missing, and what the next 24 months of inference infrastructure look like.",
+    location: 'DBH 6011', time: '4:00 – 5:30 PM',
+  },
+]
+
 // ── Sponsor logos (for Projects pillar reuse) ────────────────────────────────
 // CACTUS uses /images/sponsors/cactus.png; AWS uses /images/sponsors/aws.png
 
-// ── Pillar icons (concept-named, not generic SaaS metaphors) ─────────────────
+// ── Pillar icons ─────────────────────────────────────────────────────────────
+// Processed transparent PNGs (see scripts/process-icons.mjs). The Pillar
+// wrapper already applies a blue drop-shadow halo, which composites cleanly
+// against the alpha channel.
 function LearningIcon() {
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-      {/* stacked terminal lines / code blocks */}
-      <rect x="14" y="20" width="92" height="80" rx="6" stroke="#4a8fd4" strokeWidth="2" />
-      <line x1="14" y1="36" x2="106" y2="36" stroke="#4a8fd4" strokeWidth="1.5" />
-      <circle cx="23" cy="28" r="2" fill="#4a8fd4" />
-      <circle cx="31" cy="28" r="2" fill="#4a8fd4" />
-      <circle cx="39" cy="28" r="2" fill="#4a8fd4" />
-      <line x1="26" y1="50" x2="42" y2="50" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
-      <line x1="46" y1="50" x2="86" y2="50" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      <line x1="26" y1="62" x2="62" y2="62" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      <line x1="34" y1="74" x2="78" y2="74" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
-      <line x1="26" y1="86" x2="50" y2="86" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-    </svg>
+    <img
+      src="/images/icons/brain.png"
+      alt="Learning"
+      style={{ height: 160, width: 'auto', objectFit: 'contain' }}
+    />
   )
 }
 
 function CommunityIcon() {
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-      {/* connected nodes / mini neural net */}
-      <line x1="30" y1="30" x2="60" y2="60" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.5" />
-      <line x1="90" y1="30" x2="60" y2="60" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.5" />
-      <line x1="30" y1="90" x2="60" y2="60" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.5" />
-      <line x1="90" y1="90" x2="60" y2="60" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.5" />
-      <line x1="30" y1="30" x2="90" y2="30" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.3" />
-      <line x1="30" y1="90" x2="90" y2="90" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.3" />
-      <line x1="30" y1="30" x2="30" y2="90" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.3" />
-      <line x1="90" y1="30" x2="90" y2="90" stroke="#4a8fd4" strokeWidth="1.5" opacity="0.3" />
-      <circle cx="60" cy="60" r="8" fill="#4a8fd4" />
-      <circle cx="30" cy="30" r="5" fill="#4a8fd4" />
-      <circle cx="90" cy="30" r="5" fill="#4a8fd4" />
-      <circle cx="30" cy="90" r="5" fill="#4a8fd4" />
-      <circle cx="90" cy="90" r="5" fill="#4a8fd4" />
-    </svg>
+    <img
+      src="/images/icons/handshake.png"
+      alt="Community"
+      style={{ height: 140, width: 'auto', objectFit: 'contain' }}
+    />
   )
 }
 
 function ProjectsIcon() {
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-      {/* geometric building blocks stacking upward */}
-      <rect x="20" y="80" width="80" height="20" stroke="#4a8fd4" strokeWidth="2" />
-      <rect x="30" y="58" width="60" height="20" stroke="#4a8fd4" strokeWidth="2" />
-      <rect x="40" y="36" width="40" height="20" stroke="#4a8fd4" strokeWidth="2" />
-      <rect x="50" y="14" width="20" height="20" stroke="#4a8fd4" strokeWidth="2" fill="#4a8fd4" fillOpacity="0.2" />
-    </svg>
+    <img
+      src="/images/icons/rocket.png"
+      alt="Projects"
+      style={{ height: 168, width: 'auto', objectFit: 'contain' }}
+    />
   )
 }
 
 // ── Reusable typography tokens ───────────────────────────────────────────────
-const EYEBROW_STYLE: React.CSSProperties = {
-  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-  fontWeight: 500,
-  fontSize: 11,
-  letterSpacing: '0.32em',
-  color: '#4a8fd4',
-  textTransform: 'uppercase',
-  margin: 0,
-}
-
-const HEADING_STYLE: React.CSSProperties = {
-  fontFamily: 'Redaction50, Georgia, serif',
-  fontSize: 'clamp(36px, 5vw, 56px)',
-  lineHeight: 1.1,
-  color: '#0a0a0a',
-  fontWeight: 400,
-  margin: '16px 0 0',
-}
-
 const BODY_STYLE: React.CSSProperties = {
   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
   fontWeight: 400,
@@ -110,70 +170,7 @@ const BODY_STYLE: React.CSSProperties = {
   color: 'rgba(10,10,10,0.7)',
 }
 
-// Pillar title: PP Neue Montreal Bold 700 at 28px because Medium (500) is not on hand (KTD5).
-const PILLAR_TITLE_STYLE: React.CSSProperties = {
-  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-  fontWeight: 700,
-  fontSize: 28,
-  color: '#0a0a0a',
-  margin: 0,
-}
-
 // ── Subcomponents ────────────────────────────────────────────────────────────
-
-function ValueProp() {
-  const reduce = useReducedMotion()
-  return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}
-    >
-      <p style={EYEBROW_STYLE}>WHAT WE DO</p>
-      <h2 style={{ ...HEADING_STYLE, maxWidth: 900, margin: '16px auto 24px' }}>
-        We don&apos;t just study AI. We build it, ship it, and grow together doing it.
-      </h2>
-      <p style={{ ...BODY_STYLE, maxWidth: 600, margin: '0 auto 64px' }}>
-        AI @ UCI is where curious students become capable builders, through workshops that
-        teach, projects that ship, and a network that opens doors.
-      </p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 24,
-          maxWidth: 1100,
-          margin: '0 auto',
-        }}
-      >
-        <img
-          src="/images/events/candid.jpg"
-          alt="AI @ UCI members at an event"
-          style={{
-            width: '100%',
-            aspectRatio: '16 / 10',
-            objectFit: 'cover',
-            borderRadius: 8,
-            border: '1px solid rgba(0,0,0,0.08)',
-          }}
-        />
-        <img
-          src="/images/events/group.jpg"
-          alt="AI @ UCI team group photo"
-          style={{
-            width: '100%',
-            aspectRatio: '16 / 10',
-            objectFit: 'cover',
-            borderRadius: 8,
-            border: '1px solid rgba(0,0,0,0.08)',
-          }}
-        />
-      </div>
-    </motion.div>
-  )
-}
 
 type PillarProps = {
   iconSide: 'left' | 'right'
@@ -182,37 +179,93 @@ type PillarProps = {
   body: string
   proof: React.ReactNode
   stagger?: number
+  // px between the icon/copy row and the proof block. Defaults to 48; the
+  // Learning pillar tightens this to 32 because its image grid already reads
+  // as a heavy element directly below the copy.
+  proofGap?: number
+  // Anchor id used by the navbar's #learning / #community / #projects links.
+  // Combined with `scroll-margin-top` so the fixed navbar doesn't crop the
+  // pill heading when scrolling to the anchor.
+  id?: string
 }
 
-function Pillar({ iconSide, icon, title, body, proof, stagger = 0 }: PillarProps) {
-  const reduce = useReducedMotion()
+// Shared row width for all three pillars. Locking the row max-width and
+// letting the copy column fill (minmax(0,1fr)) guarantees every pillar
+// occupies the exact same horizontal footprint regardless of icon size, so
+// the section reads as a uniform stack rather than three different widths.
+// Matches CONTENT_MAX used by every other section so the pillar row sits
+// flush with the rest of the site grid.
+const PILLAR_ROW_MAX = 1200
+
+function Pillar({ iconSide, icon, title, body, proof, stagger = 0, proofGap = 48, id }: PillarProps) {
+  // Icon column auto-sizes to the icon's intrinsic width and sits flush
+  // against the section's outer edge (left or right depending on `iconSide`),
+  // so the text gets the rest of the row and reads as a true two-up.
   const iconCol = (
-    <div style={{ display: 'flex', justifyContent: 'center', filter: 'drop-shadow(0 0 24px rgba(74,143,212,0.25))' }}>
-      {icon}
-    </div>
+    <FadeItem>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: iconSide === 'left' ? 'flex-start' : 'flex-end',
+        }}
+      >
+        {icon}
+      </div>
+    </FadeItem>
   )
   const copyCol = (
-    <div style={{ maxWidth: 480 }}>
-      <h3 style={PILLAR_TITLE_STYLE}>{title}</h3>
-      <p style={{ ...BODY_STYLE, marginTop: 16 }}>{body}</p>
+    <div style={{ textAlign: 'left', minWidth: 0 }}>
+      <FadeItem>
+        {/* Pillar label as a clean outlined pill — replaces the previous
+            display-sized h3 so the brain/handshake/rocket icon carries the
+            visual weight and the body copy reads as the primary content. */}
+        <span
+          style={{
+            display: 'inline-block',
+            padding: '8px 22px',
+            border: '1px solid rgba(10,10,10,0.85)',
+            borderRadius: 9999,
+            fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+            fontSize: 18,
+            fontWeight: 400,
+            lineHeight: 1,
+            color: '#0a0a0a',
+            letterSpacing: '-0.005em',
+          }}
+        >
+          {title}
+        </span>
+      </FadeItem>
+      <FadeItem>
+        <p style={{ ...BODY_STYLE, marginTop: 20 }}>{body}</p>
+      </FadeItem>
     </div>
   )
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, delay: stagger, ease: [0.25, 0.1, 0.25, 1] }}
-      style={{ padding: '64px 0' }}
+    <div id={id} style={{ scrollMarginTop: 96 }}>
+    <FadeStagger
+      delay={stagger}
+      stagger={0.09}
+      amount={0.15}
+      style={{ padding: '32px 0' }}
     >
       <div
+        className="pillar-row"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          // Icon column auto-sizes to its intrinsic width; copy column fills
+          // the remaining track. Combined with PILLAR_ROW_MAX, every pillar
+          // (regardless of icon dimensions) occupies the exact same row
+          // footprint — so Learning / Community / Projects are visually
+          // uniform across the full vertical stack.
+          gridTemplateColumns:
+            iconSide === 'left'
+              ? 'auto minmax(0, 1fr)'
+              : 'minmax(0, 1fr) auto',
           alignItems: 'center',
-          gap: 64,
-          maxWidth: 1200,
-          margin: '0 auto 48px',
+          columnGap: 64,
+          maxWidth: PILLAR_ROW_MAX,
+          margin: `0 auto ${proofGap}px`,
         }}
       >
         {iconSide === 'left' ? (
@@ -227,78 +280,158 @@ function Pillar({ iconSide, icon, title, body, proof, stagger = 0 }: PillarProps
           </>
         )}
       </div>
-      {proof}
-    </motion.div>
+      <FadeItem>{proof}</FadeItem>
+      {/* Responsive: stack icon over copy on narrow screens so the icon never
+          eats half the viewport at phone widths. */}
+      <style>{`
+        @media (max-width: 768px) {
+          .pillar-row {
+            grid-template-columns: 1fr !important;
+            row-gap: 24px !important;
+            text-align: left !important;
+          }
+        }
+      `}</style>
+    </FadeStagger>
+    </div>
   )
 }
 
-// ── Pillar 1 proof: event carousel + meeting info ────────────────────────────
+// ── Pillar 1 proof: two-image cross-fading display + meeting info ────────────
+// Splits EVENTS into pairs and auto-cycles through them every 5s, showing two
+// photos side by side with captions. Honors reduced-motion (no auto-advance,
+// instant transitions). Click a dot or hover the grid to pause and control.
+const EVENT_PAIRS: Event[][] = (() => {
+  const pairs: Event[][] = []
+  for (let i = 0; i < EVENTS.length; i += 2) pairs.push(EVENTS.slice(i, i + 2))
+  return pairs
+})()
+const EVENTS_AUTOPLAY_MS = 5000
+
 function EventsCarousel() {
-  const items = [...EVENTS, ...EVENTS]
+  const [pairIndex, setPairIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const reduce = useReducedMotion()
+  const pair = EVENT_PAIRS[pairIndex]
+
+  useEffect(() => {
+    if (reduce || paused || EVENT_PAIRS.length < 2) return
+    const t = window.setInterval(() => {
+      setPairIndex(i => (i + 1) % EVENT_PAIRS.length)
+    }, EVENTS_AUTOPLAY_MS)
+    return () => window.clearInterval(t)
+  }, [reduce, paused])
+
   return (
-    <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
+    // Carousel intentionally inset narrower than the pillar row above so the
+    // image grid reads as a contained sub-block. 880px matches the
+    // SpeakerSchedule card width — both Learning + Community proofs share
+    // the same horizontal footprint for cross-pillar symmetry, and both sit
+    // visibly inset inside the 1200px pillar row.
+    <div style={{ maxWidth: 880, margin: '0 auto' }}>
       <div
-        style={{
-          WebkitMaskImage:
-            'linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)',
-          maskImage:
-            'linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)',
-        }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
       >
-        <div
-          className="carousel-scroll-wrapper"
-          style={{
-            display: 'flex',
-            width: 'max-content',
-            animation: 'scroll-left 60s linear infinite',
-          }}
-          onMouseEnter={e => {
-            ;(e.currentTarget as HTMLElement).style.animationPlayState = 'paused'
-          }}
-          onMouseLeave={e => {
-            ;(e.currentTarget as HTMLElement).style.animationPlayState = 'running'
-          }}
-        >
-          {items.map((ev, i) => (
-            <div
-              key={`${ev.name}-${i}`}
-              style={{
-                width: 360,
-                flexShrink: 0,
-                marginRight: 24,
-                transition: 'transform 200ms ease',
-              }}
-            >
-              <img
-                src={ev.src}
-                alt={ev.alt}
-                style={{
-                  width: '100%',
-                  height: 280,
-                  objectFit: 'cover',
-                  borderRadius: 8,
-                  border: '1px solid rgba(0,0,0,0.08)',
-                  transition: 'border-color 150ms ease',
-                }}
-                onMouseEnter={e => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.3)'
-                }}
-                onMouseLeave={e => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.08)'
-                }}
-              />
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 14, color: '#0a0a0a' }}>
-                  {ev.name}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pairIndex}
+            initial={reduce ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 24,
+            }}
+            className="events-grid"
+          >
+            {pair.map(ev => (
+              <div key={ev.name + ev.date}>
+                <div
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16 / 10',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    border: '0.5px solid rgba(0,0,0,0.08)',
+                  }}
+                >
+                  <img
+                    src={ev.src}
+                    alt={ev.alt}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
                 </div>
-                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 12, color: 'rgba(74,143,212,0.8)', marginTop: 2 }}>
-                  {ev.date}
+                <div style={{ marginTop: 14 }}>
+                  <div
+                    style={{
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 14,
+                      color: 'rgba(0,0,0,0.75)',
+                    }}
+                  >
+                    {ev.name}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 12,
+                      color: 'rgba(0,0,0,0.4)',
+                      marginTop: 2,
+                    }}
+                  >
+                    {ev.date}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
+
+      {EVENT_PAIRS.length > 1 && (
+        <div
+          role="tablist"
+          aria-label="Event slides"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 10,
+            marginTop: 24,
+          }}
+        >
+          {EVENT_PAIRS.map((_, i) => {
+            const active = i === pairIndex
+            return (
+              <button
+                key={i}
+                role="tab"
+                aria-selected={active}
+                aria-label={`Show event pair ${i + 1} of ${EVENT_PAIRS.length}`}
+                onClick={() => setPairIndex(i)}
+                style={{
+                  width: active ? 24 : 6,
+                  height: 6,
+                  borderRadius: 9999,
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  background: active ? '#0a0a0a' : 'rgba(0,0,0,0.18)',
+                  transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              />
+            )
+          })}
+        </div>
+      )}
+
       <div
         style={{
           display: 'flex',
@@ -324,6 +457,283 @@ function EventsCarousel() {
           {MEETING_INFO_COPY}
         </span>
       </div>
+
+      {/* Stack pair vertically on narrow screens so each image keeps a
+          comfortable size rather than getting crushed into half the viewport. */}
+      <style>{`
+        @media (max-width: 720px) {
+          .events-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ── Pillar 2 proof: interactive speaker schedule (mock lineup) ──────────────
+// Small two-pane card. Left = date list (click or arrow-keys to navigate),
+// right = animated detail pane. Replaces the previous "coming soon" empty
+// state while SPEAKERS is still being finalized.
+function SpeakerSchedule() {
+  const [selected, setSelected] = useState(0)
+  const reduce = useReducedMotion()
+  const current = SPEAKER_LINEUP[selected]
+  const initials = current.name
+    .split(' ')
+    .map(s => s[0])
+    .slice(0, 2)
+    .join('')
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      setSelected(i => (i + 1) % SPEAKER_LINEUP.length)
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault()
+      setSelected(i => (i - 1 + SPEAKER_LINEUP.length) % SPEAKER_LINEUP.length)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        maxWidth: 880,
+        margin: '0 auto',
+        background: '#f8f9fc',
+        border: '0.5px solid rgba(0,0,0,0.08)',
+        borderRadius: 16,
+        overflow: 'hidden',
+      }}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
+      role="region"
+      aria-label="Speaker schedule"
+    >
+      <div style={{ padding: '18px 28px', borderBottom: '0.5px solid rgba(0,0,0,0.06)' }}>
+        <div style={{ fontFamily: 'Redaction50, Georgia, serif', fontSize: 22, color: '#0a0a0a', lineHeight: 1.1 }}>
+          Fall &rsquo;25 – Winter &rsquo;26 Speaker Series
+        </div>
+        <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+          Wednesdays · DBH 6011 · 4:00 PM
+        </div>
+      </div>
+
+      <div
+        className="speakers-grid"
+        style={{ display: 'grid', gridTemplateColumns: '240px 1fr', minHeight: 360 }}
+      >
+        <div
+          role="listbox"
+          aria-label="Upcoming talks"
+          style={{
+            borderRight: '0.5px solid rgba(0,0,0,0.06)',
+            padding: '8px 0',
+            maxHeight: 400,
+            overflowY: 'auto',
+          }}
+        >
+          {SPEAKER_LINEUP.map((ev, i) => {
+            const isActive = i === selected
+            return (
+              <button
+                key={`${ev.date}-${ev.name}`}
+                onClick={() => setSelected(i)}
+                role="option"
+                aria-selected={isActive}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  padding: '12px 20px',
+                  background: isActive ? 'rgba(74,143,212,0.08)' : 'transparent',
+                  borderLeft: `2px solid ${isActive ? '#4a8fd4' : 'transparent'}`,
+                  borderTop: 'none',
+                  borderRight: 'none',
+                  borderBottom: 'none',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  transition: 'background 120ms ease',
+                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) {
+                    ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.025)'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) {
+                    ;(e.currentTarget as HTMLElement).style.background = 'transparent'
+                  }
+                }}
+              >
+                <div style={{ width: 52, flexShrink: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: 'rgba(0,0,0,0.4)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {ev.weekday}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      color: isActive ? '#4a8fd4' : '#0a0a0a',
+                      fontWeight: isActive ? 500 : 400,
+                      marginTop: 2,
+                    }}
+                  >
+                    {ev.date}
+                  </div>
+                </div>
+                <div style={{ flex: 1, marginLeft: 8, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: '#0a0a0a',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {ev.name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(0,0,0,0.45)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      marginTop: 1,
+                    }}
+                  >
+                    {ev.company}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        <div style={{ padding: '28px 32px', position: 'relative' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selected}
+              initial={reduce ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    background:
+                      'linear-gradient(135deg, rgba(74,143,212,0.18), rgba(74,143,212,0.06))',
+                    border: '0.5px solid rgba(74,143,212,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'Redaction50, Georgia, serif',
+                    fontSize: 18,
+                    color: '#4a8fd4',
+                    flexShrink: 0,
+                  }}
+                >
+                  {initials}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: 'Redaction50, Georgia, serif',
+                      fontSize: 22,
+                      color: '#0a0a0a',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {current.name}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                      fontSize: 13,
+                      color: 'rgba(0,0,0,0.55)',
+                      marginTop: 3,
+                    }}
+                  >
+                    {current.role} · {current.company}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                  fontSize: 15,
+                  fontStyle: 'italic',
+                  color: '#0a0a0a',
+                  marginTop: 22,
+                  lineHeight: 1.35,
+                }}
+              >
+                &ldquo;{current.topic}&rdquo;
+              </div>
+
+              <p
+                style={{
+                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                  fontSize: 13,
+                  lineHeight: 1.55,
+                  color: 'rgba(0,0,0,0.65)',
+                  marginTop: 10,
+                  marginBottom: 0,
+                }}
+              >
+                {current.abstract}
+              </p>
+
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 18,
+                  marginTop: 22,
+                  paddingTop: 16,
+                  borderTop: '0.5px solid rgba(0,0,0,0.06)',
+                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                  fontSize: 12,
+                  color: 'rgba(0,0,0,0.55)',
+                }}
+              >
+                <span>{current.location}</span>
+                <span style={{ color: 'rgba(0,0,0,0.2)' }}>·</span>
+                <span>{current.time}</span>
+                <span style={{ color: 'rgba(0,0,0,0.2)' }}>·</span>
+                <span style={{ color: '#4a8fd4' }}>
+                  {selected + 1} / {SPEAKER_LINEUP.length}
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 720px) {
+          .speakers-grid { grid-template-columns: 1fr !important; }
+          .speakers-grid > div:first-child {
+            border-right: none !important;
+            border-bottom: 0.5px solid rgba(0,0,0,0.06) !important;
+            max-height: 220px !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -334,23 +744,7 @@ function SpeakersCarousel() {
   const reduce = useReducedMotion()
 
   if (SPEAKERS.length === 0) {
-    return (
-      <div
-        style={{
-          maxWidth: 480,
-          margin: '0 auto',
-          padding: '48px 24px',
-          textAlign: 'center',
-          background: '#f8f9fc',
-          border: '1px solid rgba(0,0,0,0.08)',
-          borderRadius: 16,
-        }}
-      >
-        <p style={{ ...BODY_STYLE, margin: 0 }}>
-          Speaker lineup coming soon. Show up Wednesday to meet them in person.
-        </p>
-      </div>
-    )
+    return <SpeakerSchedule />
   }
 
   const current = SPEAKERS[index]
@@ -445,6 +839,9 @@ function ProjectCard({
   logo,
   logoAlt,
   large = false,
+  image,
+  imageAlt,
+  imageHeight,
 }: {
   title: string
   description: string
@@ -452,6 +849,16 @@ function ProjectCard({
   logo?: string
   logoAlt?: string
   large?: boolean
+  // Optional hero image that fills the card's mid-section between the copy
+  // block and the sponsor logo. Used on the AWS CloudHacks card to show the
+  // room from last year.
+  image?: string
+  imageAlt?: string
+  // Optional fixed pixel height for the image. When omitted, the image renders
+  // at a 16:10 aspect ratio (CloudHacks default). When set, the image becomes
+  // a short cropped banner — used on CACTUS and Winter Quarter Project so
+  // their cards stay short enough that they don't stretch the AWS card.
+  imageHeight?: number
 }) {
   return (
     <div
@@ -506,6 +913,22 @@ function ProjectCard({
         </h4>
         <p style={{ ...BODY_STYLE, fontSize: large ? 16 : 14, marginTop: 12 }}>{description}</p>
       </div>
+      {image && (
+        <img
+          src={image}
+          alt={imageAlt || ''}
+          style={{
+            width: '100%',
+            ...(imageHeight
+              ? { height: imageHeight }
+              : { aspectRatio: '16 / 10' }),
+            objectFit: 'cover',
+            borderRadius: 10,
+            marginTop: 24,
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}
+        />
+      )}
       {logo && (
         <img
           src={logo}
@@ -541,6 +964,9 @@ function ProjectsGrid() {
           tag="Active"
           logo="/images/sponsors/cactus.png"
           logoAlt="Cactus"
+          image="/images/projects/cactus-cover.png"
+          imageAlt="Editorial illustration of a saguaro cactus against a desert sky"
+          imageHeight={100}
         />
         <ProjectCard
           title="Winter Quarter Project"
@@ -563,6 +989,8 @@ function ProjectsGrid() {
           logo="/images/sponsors/aws.png"
           logoAlt="AWS"
           large
+          image="/images/events/learning-cloudhacks.png"
+          imageAlt="Audience at the AWS CloudHacks 2025 kickoff"
         />
       </div>
     </div>
@@ -572,123 +1000,164 @@ function ProjectsGrid() {
 // ── Who We Are block ─────────────────────────────────────────────────────────
 function WhoWeAre() {
   const reduce = useReducedMotion()
+  // Photos are fan-stacked inside a square right-column container. `width` is
+  // the percentage of the container each card spans; `top`/`left` are the
+  // un-rotated anchor. Sized so the rotated bounding boxes of all three stay
+  // inside the container — none get clipped at the section's right edge.
   const photos = [
     {
-      src: '/images/events/pic02.jpg',
-      alt: 'AI @ UCI members at an event',
-      rotate: '-5deg',
-      top: '6%',
-      left: '4%',
+      src: '/images/events/learning-aws-workshop.png',
+      alt: 'Members working on laptops at an AWS workshop',
+      rotate: '-7deg',
+      top: '4%',
+      left: '2%',
+      width: '66%',
       z: 1,
     },
     {
-      src: '/images/events/candid.jpg',
-      alt: 'AI @ UCI workshop',
-      rotate: '4deg',
+      src: '/images/events/learning-aif2.png',
+      alt: 'Crowd at the AI @ UCI booth at the Involvement Fair',
+      rotate: '6deg',
       top: '24%',
-      left: '14%',
+      left: '30%',
+      width: '66%',
       z: 2,
     },
     {
-      src: '/images/events/group.jpg',
-      alt: 'AI @ UCI team group photo',
+      src: '/images/events/team-2026.png',
+      alt: 'AI @ UCI officer team group photo',
       rotate: '-2deg',
-      top: '0%',
-      left: '0%',
+      top: '10%',
+      left: '15%',
+      width: '70%',
       z: 3,
     },
   ]
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    <FadeStagger
+      stagger={0.1}
+      amount={0.25}
+      className="who-we-are"
       style={{
         maxWidth: 1200,
-        margin: '0 auto 96px',
+        margin: '0 auto 24px',
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 55fr) minmax(0, 45fr)',
+        gridTemplateColumns: '1fr 1fr',
         gap: 64,
         alignItems: 'center',
       }}
     >
       {/* Left column: heading + body + stats */}
       <div>
-        <h2
-          style={{
-            fontFamily: 'Redaction50, Georgia, serif',
-            fontSize: 'clamp(40px, 5.5vw, 64px)',
-            lineHeight: 1.05,
-            color: '#0a0a0a',
-            fontWeight: 400,
-            margin: 0,
-          }}
-        >
-          Who We Are
-        </h2>
-        <p
-          style={{
-            fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-            fontWeight: 400,
-            fontSize: 17,
-            lineHeight: 1.6,
-            color: 'rgba(10,10,10,0.7)',
-            margin: '24px 0 0',
-            maxWidth: 540,
-          }}
-        >
-          AI @ UCI is UC Irvine&apos;s student-run artificial intelligence club. We bring together
-          builders, researchers, and curious minds to learn by doing through hands-on workshops,
-          real projects, and a community that grows together every quarter.
-        </p>
+        <FadeItem>
+          <h2
+            style={{
+              fontFamily: 'Redaction50, Georgia, serif',
+              fontSize: 'clamp(40px, 5.5vw, 64px)',
+              lineHeight: 1.05,
+              color: '#0a0a0a',
+              fontWeight: 400,
+              margin: 0,
+            }}
+          >
+            Who We Are
+          </h2>
+        </FadeItem>
+        <FadeItem>
+          <p
+            style={{
+              fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+              fontWeight: 400,
+              fontSize: 17,
+              lineHeight: 1.6,
+              color: 'rgba(10,10,10,0.7)',
+              margin: '24px 0 0',
+              maxWidth: 540,
+            }}
+          >
+            AI @ UCI is UC Irvine&apos;s student-run artificial intelligence club. We bring together
+            builders, researchers, and curious minds to learn by doing through hands-on workshops,
+            real projects, and a community that grows together every quarter.
+          </p>
+        </FadeItem>
 
-        <div
-          style={{
-            marginTop: 56,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            rowGap: 40,
-            columnGap: 48,
-            maxWidth: 480,
-          }}
-        >
-          <Stat number="500+" label="active members" />
-          <Stat number="15+" label="shipped projects" />
-          <Stat number="20+" label="quarters running" />
-        </div>
+        <FadeItem>
+          <div
+            style={{
+              marginTop: 24,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              rowGap: 40,
+              columnGap: 32,
+              maxWidth: 540,
+            }}
+          >
+            <Stat number="500+" label="active members" />
+            <Stat number="15+" label="shipped projects" />
+            <Stat number="20+" label="quarters running" />
+          </div>
+        </FadeItem>
       </div>
 
-      {/* Right column: fanned photo stack */}
+      {/* Right column: fanned photo stack — each card fades + rotates into place */}
       <div
+        className="who-we-are-photos"
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '4 / 5',
-          minHeight: 360,
+          aspectRatio: '1 / 1',
+          minHeight: 380,
         }}
       >
-        {photos.map((p, i) => (
-          <img
-            key={i}
-            src={p.src}
-            alt={p.alt}
-            style={{
-              position: 'absolute',
-              top: p.top,
-              left: p.left,
-              width: '78%',
-              aspectRatio: '4 / 3',
-              objectFit: 'cover',
-              borderRadius: 12,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              transform: `rotate(${p.rotate})`,
-              zIndex: p.z,
-            }}
-          />
-        ))}
+        {photos.map((p, i) => {
+          const initial = reduce
+            ? false
+            : { opacity: 0, scale: 0.92, rotate: 0 }
+          const target = { opacity: 1, scale: 1, rotate: parseFloat(p.rotate) }
+          return (
+            <motion.img
+              key={i}
+              src={p.src}
+              alt={p.alt}
+              initial={initial}
+              whileInView={target}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{
+                duration: 0.8,
+                delay: 0.25 + i * 0.12,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              style={{
+                position: 'absolute',
+                top: p.top,
+                left: p.left,
+                width: p.width,
+                aspectRatio: '4 / 3',
+                objectFit: 'cover',
+                borderRadius: 12,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                zIndex: p.z,
+                transformOrigin: 'center center',
+              }}
+            />
+          )
+        })}
       </div>
-    </motion.div>
+
+      {/* Responsive: stack columns and let photos fill the row on small screens. */}
+      <style>{`
+        @media (max-width: 768px) {
+          .who-we-are {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+          }
+          .who-we-are-photos {
+            aspect-ratio: 4 / 3 !important;
+            min-height: 320px !important;
+          }
+        }
+      `}</style>
+    </FadeStagger>
   )
 }
 
@@ -726,34 +1195,61 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{ background: '#ffffff', padding: '96px 32px', overflow: 'hidden' }}
+      style={{
+        background: '#ffffff',
+        scrollMarginTop: 96,
+        // Unified site-wide horizontal gutter (matches Team, Schedule).
+        // Vertical rhythm: 96px on all major sections.
+        padding: '96px clamp(24px, 5vw, 64px)',
+        overflow: 'hidden',
+      }}
     >
       <WhoWeAre />
-      <ValueProp />
 
-      <div style={{ marginTop: 96 }}>
+      <div>
+        <FadeUp>
+          <h2
+            style={{
+              fontFamily: 'Redaction50, Georgia, serif',
+              fontSize: 'clamp(40px, 5.5vw, 64px)',
+              lineHeight: 1.05,
+              color: '#0a0a0a',
+              fontWeight: 400,
+              margin: '0 0 8px',
+              textAlign: 'center',
+            }}
+          >
+            What We Provide
+          </h2>
+        </FadeUp>
+
         <Pillar
+          id="learning"
           iconSide="left"
           icon={<LearningIcon />}
           title="Learning"
-          body="Hands-on workshops with the tools that ship products: Claude, Cursor, NVIDIA stacks, Supabase, AWS. You leave with working code, not slides."
+          body="We run workshops every week on the tools people actually ship with. Claude, AWS, Cursor, NVIDIA stacks, Supabase. Not intro slides, not surface-level overviews. You come in, you build something that works, and you leave understanding why it works. The goal is that you walk out with something you can actually use."
           proof={<EventsCarousel />}
+          proofGap={32}
         />
 
         <Pillar
+          id="community"
           iconSide="right"
           icon={<CommunityIcon />}
           title="Community"
-          body="Speakers, hackathons, and weekly meetings where builders, researchers, and beginners meet. Show up once and you'll know somebody by the end."
+          body="Engineers, researchers, and founders come through to talk about what they're really working on. Not polished keynotes, actual conversations about what's hard and what's working. Outside of that, we meet every Wednesday and the room fills up fast. Show up once and you'll know people by the end of the night."
           proof={<SpeakersCarousel />}
           stagger={0.1}
+          proofGap={32}
         />
 
         <Pillar
+          id="projects"
           iconSide="left"
           icon={<ProjectsIcon />}
           title="Projects"
-          body="CACTUS, the Winter Quarter Project, and AWS CloudHacks 2026. Real builds, real shipped impact, and a portfolio piece you didn't have to invent."
+          body="CACTUS, Winter Quarter Project, AWS CloudHacks 2026. These aren't school assignments with a rubric. They're real projects with real timelines, built by small teams who actually care about the outcome. The kind of thing you can pull up in an interview and walk someone through start to finish."
           proof={<ProjectsGrid />}
           stagger={0.2}
         />

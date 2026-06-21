@@ -1,12 +1,20 @@
 'use client'
-import { useState } from 'react'
-import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionTemplate,
+  useMotionValue,
+  useMotionValueEvent,
+} from 'framer-motion'
+import { FadeStagger, FadeItem } from './motion-primitives'
 
 const NAV_LINKS = [
-  { label: 'Learning',  href: '#learning'  },
-  { label: 'Network',   href: '#network'   },
-  { label: 'Projects',  href: '#projects'  },
   { label: 'About',     href: '#about'     },
+  { label: 'Learning',  href: '#learning'  },
+  { label: 'Community', href: '#community' },
+  { label: 'Projects',  href: '#projects'  },
   { label: 'Team',      href: '#team'      },
 ]
 
@@ -14,30 +22,53 @@ function scrollTo(href: string) {
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { scrollY } = useScroll()
 
+  // `morphY` is a ratchet that the navbar morph transforms read instead of
+  // scrollY directly. It only advances on scroll DOWN and snaps back to 0 when
+  // the user actually returns to the very top — so scrolling up never unwinds
+  // the pill back into a rectangle mid-page.
+  const morphY = useMotionValue(0)
+  useEffect(() => {
+    morphY.set(scrollY.get())
+  }, [morphY, scrollY])
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    if (latest <= 4) {
+      morphY.set(0)
+      return
+    }
+    if (latest > morphY.get()) morphY.set(latest)
+  })
+
   // Morph from full-width bar → floating pill as user scrolls
-  const navPT       = useTransform(scrollY, [60, 200], [10, 10])
-  const navPX       = useTransform(scrollY, [60, 200], [32, 20])
-  const innerMaxW   = useTransform(scrollY, [60, 200], [3000, 820])
-  const innerRadius = useTransform(scrollY, [60, 200], [0, 9999])
-  const innerPX     = useTransform(scrollY, [60, 200], [4, 28])
-  const innerPY     = useTransform(scrollY, [60, 200], [10, 10])
-  const bgAlpha     = useTransform(scrollY, [0, 60, 200], [0, 0.72, 0.72])
-  const blurAmt     = useTransform(scrollY, [0, 60, 200], [0, 28, 36])
-  const borderA     = useTransform(scrollY, [0, 60, 200], [0, 0.13, 0.13])
-  const shadowA     = useTransform(scrollY, [60, 200], [0, 0.12])
+  const navPT       = useTransform(morphY, [60, 200], [10, 10])
+  const navPX       = useTransform(morphY, [60, 200], [32, 20])
+  const innerMaxW   = useTransform(morphY, [60, 200], [3000, 820])
+  const innerRadius = useTransform(morphY, [60, 200], [0, 9999])
+  const innerPX     = useTransform(morphY, [60, 200], [4, 28])
+  const innerPY     = useTransform(morphY, [60, 200], [10, 10])
+  const bgAlpha     = useTransform(morphY, [0, 60, 200], [0, 0.72, 0.72])
+  const blurAmt     = useTransform(morphY, [0, 60, 200], [0, 28, 36])
+  const borderA     = useTransform(morphY, [0, 60, 200], [0, 0.13, 0.13])
+  const shadowA     = useTransform(morphY, [60, 200], [0, 0.12])
   // Inset highlight/shadow alphas: fade in with the glass background so the
   // bottom hairline doesn't appear on the bare landing state.
-  const insetTopA    = useTransform(scrollY, [0, 60, 200], [0, 0.9, 0.9])
-  const insetBottomA = useTransform(scrollY, [0, 60, 200], [0, 0.04, 0.04])
+  const insetTopA    = useTransform(morphY, [0, 60, 200], [0, 0.9, 0.9])
+  const insetBottomA = useTransform(morphY, [0, 60, 200], [0, 0.04, 0.04])
+  // Below-bar hairline: a 1px shadow that fades in with scroll so the bar
+  // separates from the page content without looking heavy.
+  const hairlineA    = useTransform(morphY, [0, 60, 200], [0, 0.06, 0.06])
 
   const navBg     = useMotionTemplate`rgba(255,255,255,${bgAlpha})`
   const navBlur   = useMotionTemplate`blur(${blurAmt}px) saturate(1.8)`
   const navBorder = useMotionTemplate`1px solid rgba(0,0,0,${borderA})`
-  const navShadow = useMotionTemplate`0 4px 32px rgba(0,0,0,${shadowA}), inset 0 1px 0 rgba(255,255,255,${insetTopA}), inset 0 -1px 0 rgba(0,0,0,${insetBottomA})`
+  const navShadow = useMotionTemplate`0 4px 32px rgba(0,0,0,${shadowA}), 0 1px 0 rgba(0,0,0,${hairlineA}), inset 0 1px 0 rgba(255,255,255,${insetTopA}), inset 0 -1px 0 rgba(0,0,0,${insetBottomA})`
 
   const pillStyle: React.CSSProperties = {
     display: 'inline-flex',
@@ -46,7 +77,7 @@ export default function Navbar() {
     padding: '7px 18px',
     fontFamily: 'PPNeueMontreal, Arial, sans-serif',
     fontSize: 13,
-    fontWeight: 400,
+    fontWeight: 500,
     letterSpacing: '0.04em',
     color: '#0a0a0a',
     background: 'rgba(255,255,255,0.55)',
@@ -66,7 +97,7 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          position: 'fixed', top: 10, left: 0, right: 0, zIndex: 50,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
           paddingTop: navPT,
           paddingLeft: navPX,
           paddingRight: navPX,
@@ -91,33 +122,57 @@ export default function Navbar() {
           justifyContent: 'space-between',
         }}>
           {/* Logo */}
-          <img
-            src="/anteater-logo.png"
-            alt="AI @ UCI"
-            draggable={false}
-            style={{ height: 30, flexShrink: 0 }}
-          />
-
-          {/* Nav link pills, right aligned */}
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            {NAV_LINKS.map(l => (
+          <FadeStagger trigger="mount" delay={0.15} stagger={0.05}>
+            <FadeItem>
               <button
-                key={l.label}
-                onClick={() => scrollTo(l.href)}
-                style={pillStyle}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
-                  e.currentTarget.style.color = '#4a8fd4'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = 'rgba(0,0,0,0.11)'
-                  e.currentTarget.style.color = '#0a0a0a'
+                onClick={scrollToTop}
+                aria-label="Back to top"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
                 }}
               >
-                {l.label}
+                <img
+                  src="/anteater-logo.png"
+                  alt="AI @ UCI"
+                  draggable={false}
+                  style={{ height: 46, display: 'block' }}
+                />
               </button>
+            </FadeItem>
+          </FadeStagger>
+
+          {/* Nav link pills, right aligned — cascade in one at a time */}
+          <FadeStagger
+            trigger="mount"
+            delay={0.25}
+            stagger={0.07}
+            style={{ display: 'flex', gap: 6, alignItems: 'center' }}
+          >
+            {NAV_LINKS.map(l => (
+              <FadeItem key={l.label}>
+                <button
+                  onClick={() => scrollTo(l.href)}
+                  style={pillStyle}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
+                    e.currentTarget.style.color = '#4a8fd4'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(0,0,0,0.11)'
+                    e.currentTarget.style.color = '#0a0a0a'
+                  }}
+                >
+                  {l.label}
+                </button>
+              </FadeItem>
             ))}
-          </div>
+          </FadeStagger>
         </motion.div>
       </motion.nav>
 
@@ -132,7 +187,20 @@ export default function Navbar() {
         borderBottom: '1px solid rgba(0,0,0,0.12)',
         boxShadow: '0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
       }}>
-        <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 28 }} />
+        <button
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
+          <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 42, display: 'block' }} />
+        </button>
         <button
           onClick={() => setOpen(o => !o)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: '#0a0a0a' }}

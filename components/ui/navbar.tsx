@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   motion,
   useScroll,
@@ -11,16 +13,12 @@ import {
 import { FadeStagger, FadeItem } from './motion-primitives'
 
 const NAV_LINKS = [
-  { label: 'About',     href: '#about'     },
-  { label: 'Learning',  href: '#learning'  },
-  { label: 'Community', href: '#community' },
-  { label: 'Projects',  href: '#projects'  },
-  { label: 'Team',      href: '#team'      },
+  { label: 'Home',     href: '/' },
+  { label: 'About',    href: '/about' },
+  { label: 'Events',   href: '/events' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Join',     href: '/join' },
 ]
-
-function scrollTo(href: string) {
-  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-}
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -28,6 +26,7 @@ function scrollToTop() {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
   const { scrollY } = useScroll()
 
   // `morphY` is a ratchet that the navbar morph transforms read instead of
@@ -49,7 +48,7 @@ export default function Navbar() {
   // Morph from full-width bar → floating pill as user scrolls
   const navPT       = useTransform(morphY, [60, 200], [10, 10])
   const navPX       = useTransform(morphY, [60, 200], [32, 20])
-  const innerMaxW   = useTransform(morphY, [60, 200], [3000, 820])
+  const innerMaxW   = useTransform(morphY, [60, 200], [3000, 980])
   const innerRadius = useTransform(morphY, [60, 200], [0, 9999])
   const innerPX     = useTransform(morphY, [60, 200], [4, 28])
   const innerPY     = useTransform(morphY, [60, 200], [10, 10])
@@ -89,6 +88,23 @@ export default function Navbar() {
     textTransform: 'capitalize' as const,
   }
 
+  const linkStyle = (active: boolean): React.CSSProperties => ({
+    ...pillStyle,
+    borderColor: active ? 'rgba(74,143,212,0.45)' : 'rgba(0,0,0,0.10)',
+    color: active ? '#4a8fd4' : '#0a0a0a',
+    textDecoration: 'none',
+  })
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (pathname === '/') {
+      e.preventDefault()
+      scrollToTop()
+    }
+  }
+
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href)
+
   return (
     <>
       <motion.nav
@@ -124,9 +140,10 @@ export default function Navbar() {
           {/* Logo */}
           <FadeStagger trigger="mount" delay={0.15} stagger={0.05}>
             <FadeItem>
-              <button
-                onClick={scrollToTop}
-                aria-label="Back to top"
+              <Link
+                href="/"
+                onClick={handleLogoClick}
+                aria-label="Home"
                 style={{
                   background: 'none',
                   border: 'none',
@@ -135,6 +152,7 @@ export default function Navbar() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   flexShrink: 0,
+                  textDecoration: 'none',
                 }}
               >
                 <img
@@ -143,7 +161,7 @@ export default function Navbar() {
                   draggable={false}
                   style={{ height: 46, display: 'block' }}
                 />
-              </button>
+              </Link>
             </FadeItem>
           </FadeStagger>
 
@@ -156,20 +174,24 @@ export default function Navbar() {
           >
             {NAV_LINKS.map(l => (
               <FadeItem key={l.label}>
-                <button
-                  onClick={() => scrollTo(l.href)}
-                  style={pillStyle}
+                <Link
+                  href={l.href}
+                  style={linkStyle(isActive(l.href))}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
-                    e.currentTarget.style.color = '#4a8fd4'
+                    if (!isActive(l.href)) {
+                      e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
+                      e.currentTarget.style.color = '#4a8fd4'
+                    }
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'rgba(0,0,0,0.11)'
-                    e.currentTarget.style.color = '#0a0a0a'
+                    if (!isActive(l.href)) {
+                      e.currentTarget.style.borderColor = 'rgba(0,0,0,0.10)'
+                      e.currentTarget.style.color = '#0a0a0a'
+                    }
                   }}
                 >
                   {l.label}
-                </button>
+                </Link>
               </FadeItem>
             ))}
           </FadeStagger>
@@ -187,9 +209,10 @@ export default function Navbar() {
         borderBottom: '1px solid rgba(0,0,0,0.12)',
         boxShadow: '0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
       }}>
-        <button
-          onClick={scrollToTop}
-          aria-label="Back to top"
+        <Link
+          href="/"
+          onClick={handleLogoClick}
+          aria-label="Home"
           style={{
             background: 'none',
             border: 'none',
@@ -197,10 +220,11 @@ export default function Navbar() {
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
+            textDecoration: 'none',
           }}
         >
           <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 42, display: 'block' }} />
-        </button>
+        </Link>
         <button
           onClick={() => setOpen(o => !o)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: '#0a0a0a' }}
@@ -222,20 +246,23 @@ export default function Navbar() {
           gap: 4,
         }}>
           {NAV_LINKS.map(l => (
-            <button
+            <Link
               key={l.label}
-              onClick={() => { scrollTo(l.href); setOpen(false) }}
+              href={l.href}
+              onClick={() => setOpen(false)}
               style={{
-                background: 'none', border: 'none', cursor: 'pointer',
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 15, fontWeight: 400,
-                color: '#0a0a0a', textAlign: 'left',
+                fontSize: 15,
+                fontWeight: isActive(l.href) ? 500 : 400,
+                color: isActive(l.href) ? '#4a8fd4' : '#0a0a0a',
+                textAlign: 'left',
                 padding: '11px 0',
                 borderBottom: '1px solid rgba(0,0,0,0.06)',
+                textDecoration: 'none',
               }}
             >
               {l.label}
-            </button>
+            </Link>
           ))}
         </div>
       )}

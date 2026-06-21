@@ -4,6 +4,7 @@ import CustomCursor from '@/components/ui/custom-cursor'
 import { AiUciHero } from '@/components/ui/ai-uci-hero'
 import AboutSection from '@/components/sections/about'
 import TeamSection from '@/components/sections/team'
+import ScheduleSection from '@/components/sections/schedule'
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <main>
         <AboutSection />
         <TeamSection />
+        <ScheduleSection />
       </main>
     </>
   )

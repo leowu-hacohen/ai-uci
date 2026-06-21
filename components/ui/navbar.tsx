@@ -29,7 +29,7 @@ export default function Navbar() {
   const blurAmt     = useTransform(scrollY, [0, 60, 200], [0, 28, 36])
   const borderA     = useTransform(scrollY, [0, 60, 200], [0, 0.13, 0.13])
   const shadowA     = useTransform(scrollY, [60, 200], [0, 0.12])
-  // Inset highlight/shadow alphas — fade in with the glass background so the
+  // Inset highlight/shadow alphas: fade in with the glass background so the
   // bottom hairline doesn't appear on the bare landing state.
   const insetTopA    = useTransform(scrollY, [0, 60, 200], [0, 0.9, 0.9])
   const insetBottomA = useTransform(scrollY, [0, 60, 200], [0, 0.04, 0.04])
@@ -98,7 +98,7 @@ export default function Navbar() {
             style={{ height: 30, flexShrink: 0 }}
           />
 
-          {/* Nav link pills — right aligned */}
+          {/* Nav link pills, right aligned */}
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             {NAV_LINKS.map(l => (
               <button

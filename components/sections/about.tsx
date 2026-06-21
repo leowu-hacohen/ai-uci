@@ -22,7 +22,7 @@ const EVENTS: Event[] = [
 ]
 
 // ── Speakers (Pillar 2 carousel) ─────────────────────────────────────────────
-// Empty by design — see KTD8 / Pillar 2 empty-state rule.
+// Empty by design. See KTD8 / Pillar 2 empty-state rule.
 // Do NOT add placeholder "TBD" entries. Real speakers only.
 type Speaker = { img: string; name: string; company: string; role: string; alt: string }
 const SPEAKERS: Speaker[] = []
@@ -110,7 +110,7 @@ const BODY_STYLE: React.CSSProperties = {
   color: 'rgba(10,10,10,0.7)',
 }
 
-// Pillar title — PP Neue Montreal Bold 700 at 28px because Medium (500) is not on hand (KTD5).
+// Pillar title: PP Neue Montreal Bold 700 at 28px because Medium (500) is not on hand (KTD5).
 const PILLAR_TITLE_STYLE: React.CSSProperties = {
   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
   fontWeight: 700,
@@ -136,7 +136,7 @@ function ValueProp() {
         We don&apos;t just study AI. We build it, ship it, and grow together doing it.
       </h2>
       <p style={{ ...BODY_STYLE, maxWidth: 600, margin: '0 auto 64px' }}>
-        AI @ UCI is where curious students become capable builders — through workshops that
+        AI @ UCI is where curious students become capable builders, through workshops that
         teach, projects that ship, and a network that opens doors.
       </p>
       <div
@@ -347,7 +347,7 @@ function SpeakersCarousel() {
         }}
       >
         <p style={{ ...BODY_STYLE, margin: 0 }}>
-          Speaker lineup coming soon — show up Wednesday to meet them in person.
+          Speaker lineup coming soon. Show up Wednesday to meet them in person.
         </p>
       </div>
     )
@@ -544,7 +544,7 @@ function ProjectsGrid() {
         />
         <ProjectCard
           title="Winter Quarter Project"
-          description="The seasonal team build — small groups, shared problem statement, a working demo by end of term."
+          description="The seasonal team build: small groups, shared problem statement, a working demo by end of term."
           tag="Q1 2026"
         />
       </div>
@@ -569,6 +569,158 @@ function ProjectsGrid() {
   )
 }
 
+// ── Who We Are block ─────────────────────────────────────────────────────────
+function WhoWeAre() {
+  const reduce = useReducedMotion()
+  const photos = [
+    {
+      src: '/images/events/pic02.jpg',
+      alt: 'AI @ UCI members at an event',
+      rotate: '-5deg',
+      top: '6%',
+      left: '4%',
+      z: 1,
+    },
+    {
+      src: '/images/events/candid.jpg',
+      alt: 'AI @ UCI workshop',
+      rotate: '4deg',
+      top: '24%',
+      left: '14%',
+      z: 2,
+    },
+    {
+      src: '/images/events/group.jpg',
+      alt: 'AI @ UCI team group photo',
+      rotate: '-2deg',
+      top: '0%',
+      left: '0%',
+      z: 3,
+    },
+  ]
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      style={{
+        maxWidth: 1200,
+        margin: '0 auto 96px',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 55fr) minmax(0, 45fr)',
+        gap: 64,
+        alignItems: 'center',
+      }}
+    >
+      {/* Left column: heading + body + stats */}
+      <div>
+        <h2
+          style={{
+            fontFamily: 'Redaction50, Georgia, serif',
+            fontSize: 'clamp(40px, 5.5vw, 64px)',
+            lineHeight: 1.05,
+            color: '#0a0a0a',
+            fontWeight: 400,
+            margin: 0,
+          }}
+        >
+          Who We Are
+        </h2>
+        <p
+          style={{
+            fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+            fontWeight: 400,
+            fontSize: 17,
+            lineHeight: 1.6,
+            color: 'rgba(10,10,10,0.7)',
+            margin: '24px 0 0',
+            maxWidth: 540,
+          }}
+        >
+          AI @ UCI is UC Irvine&apos;s student-run artificial intelligence club. We bring together
+          builders, researchers, and curious minds to learn by doing through hands-on workshops,
+          real projects, and a community that grows together every quarter.
+        </p>
+
+        <div
+          style={{
+            marginTop: 56,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            rowGap: 40,
+            columnGap: 48,
+            maxWidth: 480,
+          }}
+        >
+          <Stat number="500+" label="active members" />
+          <Stat number="15+" label="shipped projects" />
+          <Stat number="20+" label="quarters running" />
+        </div>
+      </div>
+
+      {/* Right column: fanned photo stack */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '4 / 5',
+          minHeight: 360,
+        }}
+      >
+        {photos.map((p, i) => (
+          <img
+            key={i}
+            src={p.src}
+            alt={p.alt}
+            style={{
+              position: 'absolute',
+              top: p.top,
+              left: p.left,
+              width: '78%',
+              aspectRatio: '4 / 3',
+              objectFit: 'cover',
+              borderRadius: 12,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              transform: `rotate(${p.rotate})`,
+              zIndex: p.z,
+            }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+function Stat({ number, label }: { number: string; label: string }) {
+  return (
+    <div>
+      <div
+        style={{
+          fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+          fontWeight: 700,
+          fontSize: 'clamp(36px, 4vw, 52px)',
+          lineHeight: 1,
+          color: '#0a0a0a',
+        }}
+      >
+        {number}
+      </div>
+      <div
+        style={{
+          fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+          fontWeight: 400,
+          fontSize: 15,
+          color: 'rgba(10,10,10,0.55)',
+          marginTop: 8,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  )
+}
+
 // ── Section root ─────────────────────────────────────────────────────────────
 export default function AboutSection() {
   return (
@@ -576,6 +728,7 @@ export default function AboutSection() {
       id="about"
       style={{ background: '#ffffff', padding: '96px 32px', overflow: 'hidden' }}
     >
+      <WhoWeAre />
       <ValueProp />
 
       <div style={{ marginTop: 96 }}>
@@ -600,7 +753,7 @@ export default function AboutSection() {
           iconSide="left"
           icon={<ProjectsIcon />}
           title="Projects"
-          body="CACTUS, the Winter Quarter Project, and AWS CloudHacks 2026 — real builds, real shipped impact, and a portfolio piece you didn't have to invent."
+          body="CACTUS, the Winter Quarter Project, and AWS CloudHacks 2026. Real builds, real shipped impact, and a portfolio piece you didn't have to invent."
           proof={<ProjectsGrid />}
           stagger={0.2}
         />

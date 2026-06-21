@@ -211,7 +211,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         ctx.restore()
       }
 
-      // 4. Gradient bridge — fade the bottom 120px of canvas to transparent (KTD1).
+      // 4. Gradient bridge: fade the bottom 120px of canvas to transparent (KTD1).
       // Erases the canvas paint with a destination-out vertical gradient so the dark
       // body bg shows through, smoothing the white→dark seam with the dark sections below.
       ctx.save()

@@ -8,7 +8,7 @@ export default function ScheduleSection() {
   const [submitted, setSubmitted] = useState(false)
   const reduce = useReducedMotion()
 
-  // STUB ONLY — wire to MailChimp/Resend/Formspree in follow-up. See KTD6 in
+  // STUB ONLY: wire to MailChimp/Resend/Formspree in follow-up. See KTD6 in
   // docs/plans/2026-06-20-001-feat-ai-uci-portfolio-buildout-plan.md.
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -135,7 +135,7 @@ export default function ScheduleSection() {
               color: '#0a0a0a',
             }}
           >
-            Thanks — we&apos;ll have signups live soon. For now, follow{' '}
+            Thanks. We&apos;ll have signups live soon. For now, follow{' '}
             <a
               href="https://instagram.com/aiuci"
               target="_blank"

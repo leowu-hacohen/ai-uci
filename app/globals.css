@@ -41,8 +41,8 @@
 /*
  * PP Neue Montreal Medium (500) is intentionally NOT declared here.
  * The Medium .otf is not available; per KTD5, pillar titles fall back to
- * font-weight: 700 (Bold) at a smaller size — see components/sections/about.tsx.
- * Do NOT use font-weight: 500 anywhere — browsers will silently match against
+ * font-weight: 700 (Bold) at a smaller size. See components/sections/about.tsx.
+ * Do NOT use font-weight: 500 anywhere, because browsers will silently match against
  * the Book (400) file and the weight distinction will collapse.
  */
 
@@ -73,7 +73,7 @@ body {
   background: #ffffff;
 }
 
-/* Hide default cursor — custom cursor takes over on fine-pointer devices */
+/* Hide default cursor: custom cursor takes over on fine-pointer devices */
 @media (pointer: fine) {
   *, *::before, *::after { cursor: none !important; }
   /* Restore expected affordances for form + interactive elements

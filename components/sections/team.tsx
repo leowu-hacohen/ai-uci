@@ -15,7 +15,7 @@ const ADVISORS: Member[] = []
 
 const OFFICERS: Member[] = []
 
-// Legacy reference roster — DO NOT render. Provided for future updates only.
+// Legacy reference roster: DO NOT render. Provided for future updates only.
 // (Pulled from aiatuci/aiatuci.github.io@master:/images/boards/ on 2026-06-20)
 // const REFERENCE_ROSTER = [
 //   { file: 'Ihler.png',                              name: 'Alexander Ihler',      role: 'Faculty Advisor' },
@@ -213,7 +213,7 @@ export default function TeamSection() {
                 margin: 0,
               }}
             >
-              Roster updates coming soon — meet the team in person on Wednesdays at 4–5:30pm
+              Roster updates coming soon. Meet the team in person on Wednesdays at 4–5:30pm
               in DBH 6011, or drop your email below to hear about the next event.
             </p>
           </div>

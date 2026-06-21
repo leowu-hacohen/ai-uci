@@ -47,8 +47,8 @@
  */
 
 :root {
-  --background: #08090e;
-  --foreground: #f0f4ff;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
 }
 
 @theme inline {
@@ -70,7 +70,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background: #08090e;
+  background: #ffffff;
 }
 
 /* Hide default cursor — custom cursor takes over on fine-pointer devices */

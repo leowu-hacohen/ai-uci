@@ -1,11 +1,13 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion'
 
 const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Team', href: '#team' },
-  { label: 'Schedule', href: '#schedule' },
+  { label: 'Learning',  href: '#learning'  },
+  { label: 'Network',   href: '#network'   },
+  { label: 'Projects',  href: '#projects'  },
+  { label: 'About',     href: '#about'     },
+  { label: 'Team',      href: '#team'      },
 ]
 
 function scrollTo(href: string) {
@@ -14,55 +16,47 @@ function scrollTo(href: string) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [activeId, setActiveId] = useState<string | null>(null)
+  const { scrollY } = useScroll()
 
-  // IntersectionObserver: mark the navbar link blue when its target section is ≥50% visible
-  useEffect(() => {
-    const ids = NAV_LINKS.map(l => l.href.slice(1))
-    const observed: HTMLElement[] = []
-    ids.forEach(id => {
-      const el = document.getElementById(id)
-      if (el) observed.push(el)
-    })
-    if (observed.length === 0) return
+  // Morph from full-width bar → floating pill as user scrolls
+  const navPT       = useTransform(scrollY, [60, 200], [10, 10])
+  const navPX       = useTransform(scrollY, [60, 200], [32, 20])
+  const innerMaxW   = useTransform(scrollY, [60, 200], [3000, 820])
+  const innerRadius = useTransform(scrollY, [60, 200], [0, 9999])
+  const innerPX     = useTransform(scrollY, [60, 200], [4, 28])
+  const innerPY     = useTransform(scrollY, [60, 200], [10, 10])
+  const bgAlpha     = useTransform(scrollY, [0, 60, 200], [0, 0.72, 0.72])
+  const blurAmt     = useTransform(scrollY, [0, 60, 200], [0, 28, 36])
+  const borderA     = useTransform(scrollY, [0, 60, 200], [0, 0.13, 0.13])
+  const shadowA     = useTransform(scrollY, [60, 200], [0, 0.12])
+  // Inset highlight/shadow alphas — fade in with the glass background so the
+  // bottom hairline doesn't appear on the bare landing state.
+  const insetTopA    = useTransform(scrollY, [0, 60, 200], [0, 0.9, 0.9])
+  const insetBottomA = useTransform(scrollY, [0, 60, 200], [0, 0.04, 0.04])
 
-    const obs = new IntersectionObserver(
-      entries => {
-        // Pick the entry most visible right now
-        const visible = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible.length > 0) setActiveId(visible[0].target.id)
-      },
-      { threshold: [0.3, 0.5, 0.75] }
-    )
-    observed.forEach(el => obs.observe(el))
-    return () => obs.disconnect()
-  }, [])
+  const navBg     = useMotionTemplate`rgba(255,255,255,${bgAlpha})`
+  const navBlur   = useMotionTemplate`blur(${blurAmt}px) saturate(1.8)`
+  const navBorder = useMotionTemplate`1px solid rgba(0,0,0,${borderA})`
+  const navShadow = useMotionTemplate`0 4px 32px rgba(0,0,0,${shadowA}), inset 0 1px 0 rgba(255,255,255,${insetTopA}), inset 0 -1px 0 rgba(0,0,0,${insetBottomA})`
 
-  // Escape closes the mobile menu
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
-
-  const linkStyle = (active: boolean): React.CSSProperties => ({
+  const pillStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    borderRadius: 9999,
+    padding: '7px 18px',
     fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-    fontWeight: 500,
     fontSize: 13,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    color: active ? '#4a8fd4' : '#f0f4ff',
-    background: 'none',
-    border: 'none',
-    padding: '6px 10px',
+    fontWeight: 400,
+    letterSpacing: '0.04em',
+    color: '#0a0a0a',
+    background: 'rgba(255,255,255,0.55)',
+    border: '1px solid rgba(0,0,0,0.10)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
     cursor: 'pointer',
-    transition: 'color 150ms ease',
-  })
+    transition: 'border-color 150ms ease, color 150ms ease',
+    textTransform: 'capitalize' as const,
+  }
 
   return (
     <>
@@ -72,146 +66,104 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          height: 64,
-          padding: '0 32px',
-          background: 'rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+          position: 'fixed', top: 10, left: 0, right: 0, zIndex: 50,
+          paddingTop: navPT,
+          paddingLeft: navPX,
+          paddingRight: navPX,
+          paddingBottom: 0,
+        }}
+      >
+        <motion.div style={{
+          margin: '0 auto',
+          maxWidth: innerMaxW,
+          borderRadius: innerRadius,
+          background: navBg,
+          backdropFilter: navBlur,
+          WebkitBackdropFilter: navBlur,
+          border: navBorder,
+          boxShadow: navShadow,
+          paddingLeft: innerPX,
+          paddingRight: innerPX,
+          paddingTop: innerPY,
+          paddingBottom: innerPY,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-        }}
-      >
-        <img
-          src="/anteater-logo.png"
-          alt="AI @ UCI"
-          draggable={false}
-          style={{ height: 32, filter: 'invert(1)', flexShrink: 0 }}
-        />
-        <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-          {NAV_LINKS.map(l => {
-            const active = activeId === l.href.slice(1)
-            return (
+        }}>
+          {/* Logo */}
+          <img
+            src="/anteater-logo.png"
+            alt="AI @ UCI"
+            draggable={false}
+            style={{ height: 30, flexShrink: 0 }}
+          />
+
+          {/* Nav link pills — right aligned */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            {NAV_LINKS.map(l => (
               <button
                 key={l.label}
                 onClick={() => scrollTo(l.href)}
-                aria-current={active ? 'location' : undefined}
-                style={linkStyle(active)}
+                style={pillStyle}
                 onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.color = '#a8c4f0'
+                  e.currentTarget.style.borderColor = 'rgba(74,143,212,0.5)'
+                  e.currentTarget.style.color = '#4a8fd4'
                 }}
                 onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLElement).style.color = '#f0f4ff'
-                }}
-                onFocus={e => {
-                  ;(e.currentTarget as HTMLElement).style.outline = '2px solid #4a8fd4'
-                  ;(e.currentTarget as HTMLElement).style.outlineOffset = '4px'
-                  ;(e.currentTarget as HTMLElement).style.borderRadius = '2px'
-                }}
-                onBlur={e => {
-                  ;(e.currentTarget as HTMLElement).style.outline = 'none'
+                  e.currentTarget.style.borderColor = 'rgba(0,0,0,0.11)'
+                  e.currentTarget.style.color = '#0a0a0a'
                 }}
               >
                 {l.label}
               </button>
-            )
-          })}
-        </div>
+            ))}
+          </div>
+        </motion.div>
       </motion.nav>
 
-      {/* Mobile glass bar + hamburger */}
-      <div
-        className="show-mobile"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          height: 60,
-          padding: '0 20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-        }}
-      >
-        <img
-          src="/anteater-logo.png"
-          alt="AI @ UCI"
-          style={{ height: 28, filter: 'invert(1)' }}
-        />
+      {/* Mobile: static glass bar + hamburger */}
+      <div className="show-mobile" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        height: 60, padding: '0 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'rgba(255,255,255,0.72)',
+        backdropFilter: 'blur(32px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(32px) saturate(1.8)',
+        borderBottom: '1px solid rgba(0,0,0,0.12)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
+      }}>
+        <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 28 }} />
         <button
           onClick={() => setOpen(o => !o)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: '#0a0a0a' }}
           aria-label="Menu"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 22,
-            color: '#f0f4ff',
-          }}
         >
           {open ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* Mobile menu panel */}
+      {/* Mobile slide-down menu */}
       {open && (
-        <div
-          id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          className="show-mobile"
-          style={{
-            position: 'fixed',
-            top: 60,
-            left: 0,
-            right: 0,
-            zIndex: 49,
-            background: 'rgba(8,9,14,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '12px 20px 20px',
-            gap: 4,
-          }}
-        >
+        <div className="show-mobile" style={{
+          position: 'fixed', top: 60, left: 0, right: 0, zIndex: 49,
+          background: 'rgba(255,255,255,0.97)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          display: 'flex', flexDirection: 'column', padding: '12px 20px 20px',
+          gap: 4,
+        }}>
           {NAV_LINKS.map(l => (
             <button
               key={l.label}
-              onClick={() => {
-                scrollTo(l.href)
-                setOpen(false)
-              }}
+              onClick={() => { scrollTo(l.href); setOpen(false) }}
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
+                background: 'none', border: 'none', cursor: 'pointer',
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                fontSize: 15,
-                fontWeight: 500,
-                color: '#f0f4ff',
-                textAlign: 'left',
-                padding: '14px 0',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
+                fontSize: 15, fontWeight: 400,
+                color: '#0a0a0a', textAlign: 'left',
+                padding: '11px 0',
+                borderBottom: '1px solid rgba(0,0,0,0.06)',
               }}
             >
               {l.label}

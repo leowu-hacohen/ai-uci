@@ -18,7 +18,7 @@ export default function ScheduleSection() {
   return (
     <section
       id="schedule"
-      style={{ background: '#08090e', padding: '96px 32px 128px' }}
+      style={{ background: '#ffffff', padding: '96px 32px 128px' }}
     >
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -45,7 +45,7 @@ export default function ScheduleSection() {
             fontFamily: 'Redaction50, Georgia, serif',
             fontSize: 'clamp(36px, 5vw, 56px)',
             lineHeight: 1.1,
-            color: '#f0f4ff',
+            color: '#0a0a0a',
             fontWeight: 400,
             margin: '16px 0 24px',
           }}
@@ -57,7 +57,7 @@ export default function ScheduleSection() {
             fontFamily: 'PPNeueMontreal, Arial, sans-serif',
             fontSize: 16,
             lineHeight: 1.6,
-            color: 'rgba(240,244,255,0.78)',
+            color: 'rgba(10,10,10,0.7)',
             margin: '0 auto 48px',
             maxWidth: 520,
           }}
@@ -86,10 +86,10 @@ export default function ScheduleSection() {
               style={{
                 flex: '1 1 240px',
                 padding: '14px 20px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#f8f9fc',
+                border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: 9999,
-                color: '#f0f4ff',
+                color: '#0a0a0a',
                 outline: 'none',
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
                 fontSize: 14,
@@ -99,7 +99,7 @@ export default function ScheduleSection() {
                 ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.4)'
               }}
               onBlur={e => {
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.1)'
               }}
             />
             <button
@@ -132,7 +132,7 @@ export default function ScheduleSection() {
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
               fontSize: 15,
               lineHeight: 1.6,
-              color: '#f0f4ff',
+              color: '#0a0a0a',
             }}
           >
             Thanks — we&apos;ll have signups live soon. For now, follow{' '}
@@ -140,7 +140,7 @@ export default function ScheduleSection() {
               href="https://instagram.com/aiuci"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#a8c4f0', textDecoration: 'underline' }}
+              style={{ color: '#4a8fd4', textDecoration: 'underline' }}
             >
               @aiuci
             </a>{' '}
@@ -157,31 +157,31 @@ export default function ScheduleSection() {
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              color: '#a8c4f0',
+              color: '#4a8fd4',
               textDecoration: 'none',
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
               fontSize: 14,
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="5" stroke="#a8c4f0" strokeWidth="2" />
-              <circle cx="12" cy="12" r="4" stroke="#a8c4f0" strokeWidth="2" />
-              <circle cx="17.5" cy="6.5" r="1.2" fill="#a8c4f0" />
+              <rect x="3" y="3" width="18" height="18" rx="5" stroke="#4a8fd4" strokeWidth="2" />
+              <circle cx="12" cy="12" r="4" stroke="#4a8fd4" strokeWidth="2" />
+              <circle cx="17.5" cy="6.5" r="1.2" fill="#4a8fd4" />
             </svg>
             <span>@aiuci</span>
           </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="5" width="18" height="16" rx="2" stroke="#a8c4f0" strokeWidth="2" />
-              <line x1="3" y1="10" x2="21" y2="10" stroke="#a8c4f0" strokeWidth="2" />
-              <line x1="8" y1="3" x2="8" y2="7" stroke="#a8c4f0" strokeWidth="2" strokeLinecap="round" />
-              <line x1="16" y1="3" x2="16" y2="7" stroke="#a8c4f0" strokeWidth="2" strokeLinecap="round" />
+              <rect x="3" y="5" width="18" height="16" rx="2" stroke="#4a8fd4" strokeWidth="2" />
+              <line x1="3" y1="10" x2="21" y2="10" stroke="#4a8fd4" strokeWidth="2" />
+              <line x1="8" y1="3" x2="8" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
+              <line x1="16" y1="3" x2="16" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span
               style={{
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
                 fontSize: 14,
-                color: 'rgba(168,196,240,0.8)',
+                color: 'rgba(74,143,212,0.8)',
               }}
             >
               {MEETING_INFO_SHORT}

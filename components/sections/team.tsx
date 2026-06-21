@@ -49,14 +49,14 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
             height: photoSize,
             margin: '0 auto',
             borderRadius: 12,
-            background: 'rgba(74,143,212,0.1)',
+            background: 'rgba(74,143,212,0.06)',
             border: '1px solid rgba(74,143,212,0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: 'Redaction50, Georgia, serif',
             fontSize: 64,
-            color: '#a8c4f0',
+            color: '#4a8fd4',
           }}
         >
           {monogram}
@@ -73,7 +73,7 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
             borderRadius: 12,
             display: 'block',
             margin: '0 auto',
-            border: '1px solid rgba(255,255,255,0.05)',
+            border: '1px solid rgba(0,0,0,0.08)',
           }}
         />
       )}
@@ -81,7 +81,7 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
         style={{
           fontFamily: 'Redaction50, Georgia, serif',
           fontSize: titleSize,
-          color: '#f0f4ff',
+          color: '#0a0a0a',
           marginTop: 16,
         }}
       >
@@ -92,7 +92,7 @@ function MemberCard({ member, size = 'officer' }: { member: Member; size?: 'advi
           style={{
             fontFamily: 'PPNeueMontreal, Arial, sans-serif',
             fontSize: 13,
-            color: '#a8c4f0',
+            color: '#4a8fd4',
             marginTop: 4,
           }}
         >
@@ -108,7 +108,7 @@ export default function TeamSection() {
   return (
     <section
       id="team"
-      style={{ background: '#0d1117', padding: '96px 32px' }}
+      style={{ background: '#fafafa', padding: '96px 32px' }}
     >
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -135,7 +135,7 @@ export default function TeamSection() {
             fontFamily: 'Redaction50, Georgia, serif',
             fontSize: 'clamp(36px, 5vw, 56px)',
             lineHeight: 1.1,
-            color: '#f0f4ff',
+            color: '#0a0a0a',
             fontWeight: 400,
             margin: '16px 0 64px',
           }}
@@ -149,7 +149,7 @@ export default function TeamSection() {
               style={{
                 fontFamily: 'Redaction50, Georgia, serif',
                 fontSize: 32,
-                color: '#f0f4ff',
+                color: '#0a0a0a',
                 marginBottom: 32,
               }}
             >
@@ -175,7 +175,7 @@ export default function TeamSection() {
               style={{
                 fontFamily: 'Redaction50, Georgia, serif',
                 fontSize: 32,
-                color: '#f0f4ff',
+                color: '#0a0a0a',
                 marginBottom: 32,
               }}
             >
@@ -199,8 +199,8 @@ export default function TeamSection() {
               maxWidth: 560,
               margin: '0 auto',
               padding: '48px 24px',
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(74,143,212,0.15)',
+              background: '#f8f9fc',
+              border: '1px solid rgba(0,0,0,0.08)',
               borderRadius: 16,
             }}
           >
@@ -209,7 +209,7 @@ export default function TeamSection() {
                 fontFamily: 'PPNeueMontreal, Arial, sans-serif',
                 fontSize: 16,
                 lineHeight: 1.6,
-                color: 'rgba(240,244,255,0.78)',
+                color: 'rgba(10,10,10,0.7)',
                 margin: 0,
               }}
             >

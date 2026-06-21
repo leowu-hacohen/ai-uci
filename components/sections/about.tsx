@@ -97,7 +97,7 @@ const HEADING_STYLE: React.CSSProperties = {
   fontFamily: 'Redaction50, Georgia, serif',
   fontSize: 'clamp(36px, 5vw, 56px)',
   lineHeight: 1.1,
-  color: '#f0f4ff',
+  color: '#0a0a0a',
   fontWeight: 400,
   margin: '16px 0 0',
 }
@@ -107,7 +107,7 @@ const BODY_STYLE: React.CSSProperties = {
   fontWeight: 400,
   fontSize: 16,
   lineHeight: 1.6,
-  color: 'rgba(240,244,255,0.78)',
+  color: 'rgba(10,10,10,0.7)',
 }
 
 // Pillar title — PP Neue Montreal Bold 700 at 28px because Medium (500) is not on hand (KTD5).
@@ -115,7 +115,7 @@ const PILLAR_TITLE_STYLE: React.CSSProperties = {
   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
   fontWeight: 700,
   fontSize: 28,
-  color: '#f0f4ff',
+  color: '#0a0a0a',
   margin: 0,
 }
 
@@ -156,7 +156,7 @@ function ValueProp() {
             aspectRatio: '16 / 10',
             objectFit: 'cover',
             borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.05)',
+            border: '1px solid rgba(0,0,0,0.08)',
           }}
         />
         <img
@@ -167,7 +167,7 @@ function ValueProp() {
             aspectRatio: '16 / 10',
             objectFit: 'cover',
             borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.05)',
+            border: '1px solid rgba(0,0,0,0.08)',
           }}
         />
       </div>
@@ -277,21 +277,21 @@ function EventsCarousel() {
                   height: 280,
                   objectFit: 'cover',
                   borderRadius: 8,
-                  border: '1px solid rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(0,0,0,0.08)',
                   transition: 'border-color 150ms ease',
                 }}
                 onMouseEnter={e => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.4)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.3)'
                 }}
                 onMouseLeave={e => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.08)'
                 }}
               />
               <div style={{ marginTop: 12 }}>
-                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 14, color: '#f0f4ff' }}>
+                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 14, color: '#0a0a0a' }}>
                   {ev.name}
                 </div>
-                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 12, color: 'rgba(168,196,240,0.8)', marginTop: 2 }}>
+                <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 12, color: 'rgba(74,143,212,0.8)', marginTop: 2 }}>
                   {ev.date}
                 </div>
               </div>
@@ -309,16 +309,16 @@ function EventsCarousel() {
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="16" rx="2" stroke="#a8c4f0" strokeWidth="2" />
-          <line x1="3" y1="10" x2="21" y2="10" stroke="#a8c4f0" strokeWidth="2" />
-          <line x1="8" y1="3" x2="8" y2="7" stroke="#a8c4f0" strokeWidth="2" strokeLinecap="round" />
-          <line x1="16" y1="3" x2="16" y2="7" stroke="#a8c4f0" strokeWidth="2" strokeLinecap="round" />
+          <rect x="3" y="5" width="18" height="16" rx="2" stroke="#4a8fd4" strokeWidth="2" />
+          <line x1="3" y1="10" x2="21" y2="10" stroke="#4a8fd4" strokeWidth="2" />
+          <line x1="8" y1="3" x2="8" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
+          <line x1="16" y1="3" x2="16" y2="7" stroke="#4a8fd4" strokeWidth="2" strokeLinecap="round" />
         </svg>
         <span
           style={{
             fontFamily: 'PPNeueMontreal, Arial, sans-serif',
             fontSize: 14,
-            color: 'rgba(168,196,240,0.8)',
+            color: 'rgba(74,143,212,0.8)',
           }}
         >
           {MEETING_INFO_COPY}
@@ -341,8 +341,8 @@ function SpeakersCarousel() {
           margin: '0 auto',
           padding: '48px 24px',
           textAlign: 'center',
-          background: 'rgba(255,255,255,0.02)',
-          border: '1px solid rgba(74,143,212,0.15)',
+          background: '#f8f9fc',
+          border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: 16,
         }}
       >
@@ -379,8 +379,8 @@ function SpeakersCarousel() {
             width: 480,
             maxWidth: '85vw',
             padding: 48,
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(74,143,212,0.15)',
+            background: '#f8f9fc',
+            border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: 16,
             textAlign: 'center',
           }}
@@ -395,16 +395,16 @@ function SpeakersCarousel() {
               borderRadius: '50%',
               margin: '0 auto 16px',
               display: 'block',
-              border: '1px solid rgba(255,255,255,0.05)',
+              border: '1px solid rgba(0,0,0,0.08)',
             }}
           />
-          <div style={{ fontFamily: 'Redaction50, Georgia, serif', fontSize: 28, color: '#f0f4ff' }}>
+          <div style={{ fontFamily: 'Redaction50, Georgia, serif', fontSize: 28, color: '#0a0a0a' }}>
             {current.name}
           </div>
-          <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 14, color: '#a8c4f0', marginTop: 4 }}>
+          <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 14, color: '#4a8fd4', marginTop: 4 }}>
             {current.company}
           </div>
-          <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 13, color: 'rgba(240,244,255,0.65)', marginTop: 4 }}>
+          <div style={{ fontFamily: 'PPNeueMontreal, Arial, sans-serif', fontSize: 13, color: 'rgba(10,10,10,0.5)', marginTop: 4 }}>
             {current.role}
           </div>
         </motion.div>
@@ -428,7 +428,7 @@ const arrowStyle: React.CSSProperties = {
   borderRadius: '50%',
   border: '1px solid rgba(74,143,212,0.4)',
   background: 'transparent',
-  color: '#f0f4ff',
+  color: '#0a0a0a',
   fontSize: 22,
   cursor: 'pointer',
   display: 'flex',
@@ -456,8 +456,8 @@ function ProjectCard({
   return (
     <div
       style={{
-        background: 'rgba(255,255,255,0.02)',
-        border: '0.5px solid rgba(74,143,212,0.15)',
+        background: '#f8f9fc',
+        border: '0.5px solid rgba(0,0,0,0.08)',
         borderRadius: 16,
         padding: 32,
         position: 'relative',
@@ -468,7 +468,7 @@ function ProjectCard({
         transition: 'all 200ms ease',
       }}
       onMouseEnter={e => {
-        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.4)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(74,143,212,0.3)'
         ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 32px rgba(74,143,212,0.1)'
       }}
       onMouseLeave={e => {
@@ -487,7 +487,7 @@ function ProjectCard({
             fontSize: 11,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '#a8c4f0',
+            color: '#4a8fd4',
             marginBottom: 16,
           }}
         >
@@ -497,7 +497,7 @@ function ProjectCard({
           style={{
             fontFamily: 'Redaction50, Georgia, serif',
             fontSize: large ? 36 : 24,
-            color: '#f0f4ff',
+            color: '#0a0a0a',
             margin: 0,
             lineHeight: 1.15,
           }}
@@ -574,7 +574,7 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{ background: '#08090e', padding: '96px 32px', overflow: 'hidden' }}
+      style={{ background: '#ffffff', padding: '96px 32px', overflow: 'hidden' }}
     >
       <ValueProp />
 

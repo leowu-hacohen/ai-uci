@@ -250,7 +250,7 @@ export default function Navbar() {
             textDecoration: 'none',
           }}
         >
-          <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 42, display: 'block' }} />
+          <img src="/anteater-logo.png" alt="AI @ UCI" style={{ height: 32, display: 'block' }} />
         </Link>
         <button
           onClick={() => setOpen(o => !o)}

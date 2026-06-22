@@ -102,7 +102,10 @@ body {
 
 @media (max-width: 768px) {
   .hidden-mobile { display: none !important; }
-  .show-mobile { display: block !important; }
+  /* .show-mobile intentionally has NO `!important` here so the component's
+     own inline `display: flex` (mobile nav bar + open hamburger menu) wins.
+     Using `!important` collapsed both into `display: block`, which made the
+     logo + hamburger sit next to each other and the menu items render inline. */
 }
 @media (min-width: 769px) {
   .show-mobile { display: none !important; }

@@ -9,6 +9,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
       <CustomCursor />
       <Navbar />
       <main
+        className="page-shell-main"
         style={{
           background: '#ffffff',
           minHeight: '100vh',
@@ -18,6 +19,13 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <style>{`
+        @media (max-width: 768px) {
+          .page-shell-main {
+            padding-top: 76px !important;
+          }
+        }
+      `}</style>
     </>
   )
 }

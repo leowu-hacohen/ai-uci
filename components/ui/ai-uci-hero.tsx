@@ -150,22 +150,33 @@ export function AiUciHero({ className = '' }: { className?: string }) {
 
       drawNetwork(netAlpha)
 
-      const fontSize = Math.min(84, W * 0.065)
+      // Mobile/portrait viewports stack the heading, subtext, and logo
+      // vertically (centered). Desktop keeps the left-text / right-logo layout.
+      // Threshold matches the CSS @media (max-width: 768px) breakpoint.
+      const isMobile = W <= 768
+
+      const fontSize = isMobile
+        ? Math.min(60, W * 0.13)
+        : Math.min(84, W * 0.065)
       const lineH    = fontSize * 0.88
       const blockH   = lineH * 3
-      const logoOX   = parallax.x * 0.011, logoOY = parallax.y * 0.011
-      const headOX   = parallax.x * 0.006, headOY = parallax.y * 0.006
-      const subOX    = parallax.x * 0.003, subOY  = parallax.y * 0.003
+      // On mobile we disable mouse parallax — phones do not provide one and
+      // the resting offsets would otherwise be locked at -W/2, -H/2.
+      const logoOX   = isMobile ? 0 : parallax.x * 0.011, logoOY = isMobile ? 0 : parallax.y * 0.011
+      const headOX   = isMobile ? 0 : parallax.x * 0.006, headOY = isMobile ? 0 : parallax.y * 0.006
+      const subOX    = isMobile ? 0 : parallax.x * 0.003, subOY  = isMobile ? 0 : parallax.y * 0.003
 
       // 1. Heading
       if (headAlpha > 0) {
         ctx.save()
         ctx.globalAlpha = headAlpha
-        const textX = W * 0.19 + headOX
-        const textY = (H - blockH) / 2 - H * 0.05 + headOY
+        const textX = isMobile ? W / 2 + headOX : W * 0.19 + headOX
+        const textY = isMobile
+          ? H * 0.11 + headOY
+          : (H - blockH) / 2 - H * 0.05 + headOY
         ctx.font = `400 ${fontSize}px Redaction50, Georgia, serif`
         ctx.fillStyle = '#0a0a0a'
-        ctx.textAlign = 'left'
+        ctx.textAlign = isMobile ? 'center' : 'left'
         ctx.textBaseline = 'top'
         ctx.letterSpacing = `${(fontSize * 0.03).toFixed(1)}px`
         ctx.fillText('Artificial', textX, textY)
@@ -179,10 +190,10 @@ export function AiUciHero({ className = '' }: { className?: string }) {
       if (logoAlpha > 0 && logoReady) {
         ctx.save()
         ctx.globalAlpha = logoAlpha
-        const scaleH = H * 0.60
+        const scaleH = isMobile ? H * 0.28 : H * 0.60
         const scaleW = scaleH * (logoImg.width / logoImg.height)
-        const cx = W * 0.68 + logoOX
-        const cy = H * 0.5 + logoOY
+        const cx = isMobile ? W / 2 + logoOX : W * 0.68 + logoOX
+        const cy = isMobile ? H * 0.68 + logoOY : H * 0.5 + logoOY
         ctx.drawImage(logoImg, cx - scaleW / 2, cy - scaleH / 2, scaleW, scaleH)
         ctx.restore()
       }
@@ -193,11 +204,15 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         ctx.save()
         ctx.globalAlpha = subAlpha
         lastSubAlpha = subAlpha
-        const subFontSize = fontSize * 0.28
+        const subFontSize = fontSize * (isMobile ? 0.32 : 0.28)
         const subLineH    = subFontSize * 1.55
-        const subBaseX    = W * 0.19 + subOX
-        const subY        = (H - blockH) / 2 - H * 0.05 + lineH * 2 + lineH * 0.75 + H * 0.05 + subOY
-        const maxSubW     = Math.min(W * 0.42, 560)
+        const subBaseX    = isMobile ? W * 0.5 + subOX : W * 0.19 + subOX
+        const subY        = isMobile
+          ? H * 0.11 + blockH + lineH * 0.55 + subOY
+          : (H - blockH) / 2 - H * 0.05 + lineH * 2 + lineH * 0.75 + H * 0.05 + subOY
+        const maxSubW     = isMobile
+          ? Math.min(W * 0.86, 400)
+          : Math.min(W * 0.42, 560)
         ctx.font = `400 ${subFontSize}px 'Space Grotesk', Arial, sans-serif`
         ctx.textBaseline = 'top'
 
@@ -207,25 +222,74 @@ export function AiUciHero({ className = '' }: { className?: string }) {
           [' that builds together.', false],
         ]
 
-        let sx = subBaseX, sy = subY
-        for (const [runText, isBlue] of runs) {
-          const parts = runText.split(/(\s+)/)
-          for (const part of parts) {
-            if (!part.length) continue
-            const isSpace = /^\s+$/.test(part)
-            const tw = ctx.measureText(part).width
-            if (!isSpace && sx + tw > subBaseX + maxSubW && sx > subBaseX) { sx = subBaseX; sy += subLineH }
-            if (isSpace && sx === subBaseX) continue
-            const wordX = sx
-            ctx.fillStyle = isBlue ? '#4a8fd4' : '#0a0a0a'
-            ctx.fillText(part, sx, sy)
-            if (
-              isBlue &&
-              (part === 'learning' || part === 'projects' || part === 'community')
-            ) {
-              hitRegions.push({ id: part, x: wordX, y: sy, w: tw, h: subLineH })
+        if (isMobile) {
+          // Mobile: layout into wrapped lines first, then center each line.
+          type Token = { text: string; isBlue: boolean }
+          const tokens: Token[] = []
+          for (const [runText, isBlue] of runs) {
+            for (const part of runText.split(/(\s+)/)) {
+              if (part.length) tokens.push({ text: part, isBlue })
             }
-            sx += tw
+          }
+          type Line = { tokens: Token[]; width: number }
+          const lines: Line[] = []
+          let curLine: Line = { tokens: [], width: 0 }
+          for (const tok of tokens) {
+            const isSpace = /^\s+$/.test(tok.text)
+            const tw = ctx.measureText(tok.text).width
+            if (!isSpace && curLine.width + tw > maxSubW && curLine.width > 0) {
+              while (curLine.tokens.length && /^\s+$/.test(curLine.tokens[curLine.tokens.length - 1].text)) {
+                const trailing = curLine.tokens.pop()!
+                curLine.width -= ctx.measureText(trailing.text).width
+              }
+              lines.push(curLine)
+              curLine = { tokens: [], width: 0 }
+            }
+            if (isSpace && curLine.width === 0) continue
+            curLine.tokens.push(tok)
+            curLine.width += tw
+          }
+          if (curLine.tokens.length) lines.push(curLine)
+
+          ctx.textAlign = 'left'
+          let sy = subY
+          for (const line of lines) {
+            let sx = subBaseX - line.width / 2
+            for (const tok of line.tokens) {
+              const tw = ctx.measureText(tok.text).width
+              ctx.fillStyle = tok.isBlue ? '#4a8fd4' : '#0a0a0a'
+              ctx.fillText(tok.text, sx, sy)
+              if (
+                tok.isBlue &&
+                (tok.text === 'learning' || tok.text === 'projects' || tok.text === 'community')
+              ) {
+                hitRegions.push({ id: tok.text, x: sx, y: sy, w: tw, h: subLineH })
+              }
+              sx += tw
+            }
+            sy += subLineH
+          }
+        } else {
+          let sx = subBaseX, sy = subY
+          for (const [runText, isBlue] of runs) {
+            const parts = runText.split(/(\s+)/)
+            for (const part of parts) {
+              if (!part.length) continue
+              const isSpace = /^\s+$/.test(part)
+              const tw = ctx.measureText(part).width
+              if (!isSpace && sx + tw > subBaseX + maxSubW && sx > subBaseX) { sx = subBaseX; sy += subLineH }
+              if (isSpace && sx === subBaseX) continue
+              const wordX = sx
+              ctx.fillStyle = isBlue ? '#4a8fd4' : '#0a0a0a'
+              ctx.fillText(part, sx, sy)
+              if (
+                isBlue &&
+                (part === 'learning' || part === 'projects' || part === 'community')
+              ) {
+                hitRegions.push({ id: part, x: wordX, y: sy, w: tw, h: subLineH })
+              }
+              sx += tw
+            }
           }
         }
         ctx.restore()

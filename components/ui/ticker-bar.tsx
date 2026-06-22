@@ -36,6 +36,7 @@ export default function TickerBar() {
 
   return (
     <div
+      className="ticker-root"
       style={{
         position: 'absolute',
         left: 0,
@@ -48,7 +49,7 @@ export default function TickerBar() {
       }}
     >
       <FadeUp trigger="mount" delay={BACKED_BY_DELAY} y={8} duration={BACKED_BY_DURATION}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, marginBottom: 16 }}>
+        <div className="ticker-backed-by" style={{ display: 'flex', justifyContent: 'center', marginTop: 32, marginBottom: 16 }}>
           <span
             style={{
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
@@ -95,6 +96,7 @@ export default function TickerBar() {
             return (
               <div
                 key={`${logo.alt}-${i}`}
+                className="ticker-slot"
                 style={{
                   width: slotW,
                   height: SLOT_HEIGHT,
@@ -132,6 +134,31 @@ export default function TickerBar() {
         @media (prefers-reduced-motion: reduce) {
           .ticker-scroll-wrapper {
             animation: none !important;
+          }
+        }
+        /* Mobile: shrink "Backed By", tighten spacing, narrower slots.
+           Uniform 130px slot width and capped image height collapse the
+           per-logo width/height variation enough to keep the reel readable
+           at narrow viewports while preserving the gradient mask edges. */
+        @media (max-width: 768px) {
+          .ticker-root {
+            padding: 12px 0 16px !important;
+          }
+          .ticker-backed-by {
+            margin-top: 12px !important;
+            margin-bottom: 8px !important;
+          }
+          .ticker-backed-by span {
+            font-size: 14px !important;
+            letter-spacing: 0.02em !important;
+          }
+          .ticker-slot {
+            width: 130px !important;
+            height: 52px !important;
+          }
+          .ticker-slot img {
+            max-height: 36px !important;
+            max-width: 90px !important;
           }
         }
       `}</style>

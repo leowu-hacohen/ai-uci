@@ -72,6 +72,7 @@ export default function ProjectsPageContent() {
           <FadeStagger key={project.title} stagger={0.06} amount={0.15} delay={i * 0.05}>
             <FadeItem>
               <article
+                className="project-card"
                 style={{
                   border: project.flagship
                     ? '1px solid rgba(74,143,212,0.25)'
@@ -97,7 +98,7 @@ export default function ProjectsPageContent() {
                     />
                   </div>
                 )}
-                <div style={{ padding: '36px 40px' }}>
+                <div className="project-card-body" style={{ padding: '36px 40px' }}>
                   <span
                     style={{
                       display: 'inline-block',
@@ -115,6 +116,7 @@ export default function ProjectsPageContent() {
                     {project.tag}
                   </span>
                   <h2
+                    className={project.flagship ? 'project-card-title flagship' : 'project-card-title'}
                     style={{
                       fontFamily: 'Redaction50, Georgia, serif',
                       fontSize: project.flagship ? 40 : 32,
@@ -148,6 +150,20 @@ export default function ProjectsPageContent() {
           </FadeStagger>
         ))}
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .project-card-body {
+            padding: 24px 22px !important;
+          }
+          .project-card-title {
+            font-size: 26px !important;
+          }
+          .project-card-title.flagship {
+            font-size: 30px !important;
+          }
+        }
+      `}</style>
     </section>
   )
 }

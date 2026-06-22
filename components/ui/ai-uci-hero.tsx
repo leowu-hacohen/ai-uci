@@ -27,9 +27,16 @@ export function AiUciHero({ className = '' }: { className?: string }) {
     let W = window.innerWidth
     let H = window.innerHeight
 
+    // Read W/H from the canvas's parent rect, not window.innerHeight.
+    // On mobile, window.innerHeight changes as the URL bar collapses on
+    // scroll, which would otherwise resize the canvas mid-scroll and
+    // visibly jump the logo + overflow the ticker. The parent uses 100svh
+    // (small viewport height) which is stable across scroll, so the rect
+    // stays put even when the browser chrome animates in and out.
     function resize() {
-      W = window.innerWidth
-      H = window.innerHeight
+      const rect = el.getBoundingClientRect()
+      W = Math.round(rect.width) || window.innerWidth
+      H = Math.round(rect.height) || window.innerHeight
       el.width = W * dpr
       el.height = H * dpr
       el.style.width = `${W}px`

@@ -174,7 +174,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         ctx.globalAlpha = headAlpha
         const textX = isMobile ? W / 2 + headOX : W * 0.19 + headOX
         const textY = isMobile
-          ? H * 0.11 + headOY
+          ? H * 0.17 + headOY
           : (H - blockH) / 2 - H * 0.05 + headOY
         ctx.font = `400 ${fontSize}px Redaction50, Georgia, serif`
         ctx.fillStyle = '#0a0a0a'
@@ -210,7 +210,7 @@ export function AiUciHero({ className = '' }: { className?: string }) {
         const subLineH    = subFontSize * 1.55
         const subBaseX    = isMobile ? W * 0.5 + subOX : W * 0.19 + subOX
         const subY        = isMobile
-          ? H * 0.11 + blockH + lineH * 0.55 + subOY
+          ? H * 0.17 + blockH + lineH * 0.55 + subOY
           : (H - blockH) / 2 - H * 0.05 + lineH * 2 + lineH * 0.75 + H * 0.05 + subOY
         const maxSubW     = isMobile
           ? Math.min(W * 0.86, 400)

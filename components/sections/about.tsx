@@ -167,36 +167,51 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
           {/* MIDDLE — pill label + body copy */}
           <div style={{ textAlign: 'left', minWidth: 0 }}>
             <FadeItem>
-              <Link
-                href="/events"
-                data-cursor-hover=""
-                style={{
-                  display: 'inline-block',
-                  padding: '8px 22px',
-                  border: '1px solid rgba(10,10,10,0.85)',
-                  borderRadius: 9999,
-                  fontFamily: 'PPNeueMontreal, Arial, sans-serif',
-                  fontSize: 18,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  color: '#0a0a0a',
-                  letterSpacing: '-0.005em',
-                  textDecoration: 'none',
-                  transition: 'border-color 150ms ease, color 150ms ease',
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = '#4a8fd4'
-                  el.style.color = '#4a8fd4'
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = 'rgba(10,10,10,0.85)'
-                  el.style.color = '#0a0a0a'
-                }}
+              <div
+                className="pillar-pill-row"
+                style={{ display: 'flex', alignItems: 'center', gap: 16 }}
               >
-                {title}
-              </Link>
+                <Link
+                  href="/events"
+                  data-cursor-hover=""
+                  style={{
+                    display: 'inline-block',
+                    padding: '8px 22px',
+                    border: '1px solid rgba(10,10,10,0.85)',
+                    borderRadius: 9999,
+                    fontFamily: 'PPNeueMontreal, Arial, sans-serif',
+                    fontSize: 18,
+                    fontWeight: 400,
+                    lineHeight: 1,
+                    color: '#0a0a0a',
+                    letterSpacing: '-0.005em',
+                    textDecoration: 'none',
+                    transition: 'border-color 150ms ease, color 150ms ease',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = '#4a8fd4'
+                    el.style.color = '#4a8fd4'
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.borderColor = 'rgba(10,10,10,0.85)'
+                    el.style.color = '#0a0a0a'
+                  }}
+                >
+                  {title}
+                </Link>
+                {/* Mobile-only icon: renders inline-right of the pill at <= 768px.
+                    On desktop this slot is hidden by CSS and the big icon in the
+                    third grid column takes over. Duplicating the SVG is cheap. */}
+                <div
+                  className="pillar-icon-mobile"
+                  aria-hidden="true"
+                  style={{ display: 'none', flexShrink: 0 }}
+                >
+                  {icon}
+                </div>
+              </div>
             </FadeItem>
             <FadeItem>
               <p style={{ ...PILLAR_BODY_STYLE, marginTop: 40, marginBottom: 0 }}>
@@ -205,9 +220,11 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
             </FadeItem>
           </div>
 
-          {/* RIGHT — icon, centered in fixed column for vertical-axis symmetry */}
+          {/* RIGHT — icon, centered in fixed column for vertical-axis symmetry.
+              Hidden on mobile (the inline mobile icon above takes its place). */}
           <FadeItem>
             <div
+              className="pillar-icon-desktop"
               style={{
                 width: PILLAR_ICON_COL,
                 display: 'flex',
@@ -349,6 +366,20 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
             }
             .pillar-row > *:last-child {
               justify-content: flex-start !important;
+            }
+            /* On mobile the big right-column icon is hidden and the inline
+               mobile icon (next to the pill label) takes over. Cap the SVG
+               at 44px so it sits flush with the pill height. */
+            .pillar-icon-desktop {
+              display: none !important;
+            }
+            .pillar-icon-mobile {
+              display: inline-flex !important;
+              align-items: center !important;
+            }
+            .pillar-icon-mobile svg {
+              width: 44px !important;
+              height: 44px !important;
             }
             .pillar-events-row {
               padding-left: 0 !important;

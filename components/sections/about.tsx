@@ -368,18 +368,27 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
               justify-content: flex-start !important;
             }
             /* On mobile the big right-column icon is hidden and the inline
-               mobile icon (next to the pill label) takes over. Cap the SVG
-               at 44px so it sits flush with the pill height. */
+               mobile icon (next to the pill label) takes over. Pill sits left,
+               icon flush right (justify-content: space-between on the row).
+               Icon ~35px (0.8x of previous 44). Body text tightens to ~18px
+               below the pill row instead of the default 40. */
             .pillar-icon-desktop {
               display: none !important;
+            }
+            .pillar-pill-row {
+              justify-content: space-between !important;
+              width: 100% !important;
             }
             .pillar-icon-mobile {
               display: inline-flex !important;
               align-items: center !important;
             }
             .pillar-icon-mobile svg {
-              width: 44px !important;
-              height: 44px !important;
+              width: 35px !important;
+              height: 35px !important;
+            }
+            .pillar-row p {
+              margin-top: 18px !important;
             }
             .pillar-events-row {
               padding-left: 0 !important;
@@ -497,6 +506,7 @@ function WhoWeAre() {
 
         <FadeItem>
           <div
+            className="who-we-are-stats"
             style={{
               marginTop: 24,
               display: 'grid',
@@ -563,7 +573,11 @@ function WhoWeAre() {
         </ScrollParallax>
       </div>
 
-      {/* Responsive: stack columns and let photos fill the row on small screens. */}
+      {/* Responsive: stack columns and let photos fill the row on small screens.
+          On iPhone SE / narrow phones, the inner 400px min-height on the photo
+          stack was forcing the viewport wider than 327px, which clipped the
+          body text and stat labels. Drop the inner min-height too so the
+          aspect-ratio derives a width that fits the column. */}
       <style>{`
         @media (max-width: 768px) {
           .who-we-are {
@@ -577,7 +591,17 @@ function WhoWeAre() {
           .who-we-are-photos {
             max-width: 100% !important;
             aspect-ratio: 4 / 3 !important;
-            min-height: 300px !important;
+            min-height: 0 !important;
+          }
+          .who-we-are-photos > div {
+            min-height: 0 !important;
+            transform: none !important;
+          }
+          /* 3-col stats → 2-col on mobile so "quarters running" doesn't clip. */
+          .who-we-are-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            column-gap: 24px !important;
+            row-gap: 28px !important;
           }
         }
       `}</style>

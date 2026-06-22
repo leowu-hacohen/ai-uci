@@ -71,6 +71,10 @@ body {
   padding: 0;
   width: 100%;
   background: #ffffff;
+  /* Prevent any nested layout (rotated photo stacks, large grids) from
+     introducing a horizontal scroll on mobile. Section-level overflow:hidden
+     stops being enough if the body itself extends past the viewport. */
+  overflow-x: hidden;
 }
 
 /* Hide default cursor: custom cursor takes over on fine-pointer devices */

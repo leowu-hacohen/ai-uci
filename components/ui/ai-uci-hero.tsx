@@ -39,9 +39,9 @@ export function AiUciHero({ className = '' }: { className?: string }) {
     resize()
 
     // ── Neural net nodes ──────────────────────────────────────────────────────
-    // Mobile gets a much thinner net (fewer nodes → fewer pairs → less visual
+    // Mobile gets a thinner net (fewer nodes → fewer pairs → less visual
     // clutter at narrow widths). Desktop is untouched at 90.
-    const NODE_COUNT = window.innerWidth <= 768 ? 32 : 90
+    const NODE_COUNT = window.innerWidth <= 768 ? 44 : 90
     const margin = 80
     const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => {
       const isLarge = Math.random() < 0.18

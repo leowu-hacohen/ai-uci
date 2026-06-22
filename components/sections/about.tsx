@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { FadeStagger, FadeItem, FadeUp, RevealFanPhoto, ScrollParallax, REVEAL_EASE, REVEAL_VIEWPORT } from '@/components/ui/motion-primitives'
+import { withHighlights } from '@/components/ui/highlighted-text'
 import { motion } from 'framer-motion'
 
 // Shared meeting-info copy (Schedule imports MEETING_INFO_SHORT)
@@ -49,7 +50,7 @@ function ProjectsIcon() {
 const PILLAR_BODY_STYLE: React.CSSProperties = {
   fontFamily: 'PPNeueMontreal, Arial, sans-serif',
   fontWeight: 400,
-  fontSize: 17,
+  fontSize: 19,
   lineHeight: 1.6,
   color: 'rgba(10,10,10,0.7)',
 }
@@ -66,6 +67,7 @@ type PillarProps = {
   icon: React.ReactNode
   title: string
   body: string
+  bodyHighlights?: string[]
   stagger?: number
   // Projects pillar: events CTA row shares the same 3-column grid below the main row.
   eventsExtension?: boolean
@@ -105,7 +107,7 @@ function EventsCtaArrow() {
   )
 }
 
-function Pillar({ id, photo, icon, title, body, stagger = 0, eventsExtension = false }: PillarProps) {
+function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eventsExtension = false }: PillarProps) {
   return (
     <div id={id} style={{ scrollMarginTop: 96 }}>
       <FadeStagger
@@ -165,7 +167,9 @@ function Pillar({ id, photo, icon, title, body, stagger = 0, eventsExtension = f
           {/* MIDDLE — pill label + body copy */}
           <div style={{ textAlign: 'left', minWidth: 0 }}>
             <FadeItem>
-              <span
+              <Link
+                href="/events"
+                data-cursor-hover=""
                 style={{
                   display: 'inline-block',
                   padding: '8px 22px',
@@ -177,13 +181,27 @@ function Pillar({ id, photo, icon, title, body, stagger = 0, eventsExtension = f
                   lineHeight: 1,
                   color: '#0a0a0a',
                   letterSpacing: '-0.005em',
+                  textDecoration: 'none',
+                  transition: 'border-color 150ms ease, color 150ms ease',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.borderColor = '#4a8fd4'
+                  el.style.color = '#4a8fd4'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.borderColor = 'rgba(10,10,10,0.85)'
+                  el.style.color = '#0a0a0a'
                 }}
               >
                 {title}
-              </span>
+              </Link>
             </FadeItem>
             <FadeItem>
-              <p style={{ ...PILLAR_BODY_STYLE, marginTop: 32 }}>{body}</p>
+              <p style={{ ...PILLAR_BODY_STYLE, marginTop: 40, marginBottom: 0 }}>
+                {withHighlights(body, bodyHighlights ?? [])}
+              </p>
             </FadeItem>
           </div>
 
@@ -313,7 +331,7 @@ function Pillar({ id, photo, icon, title, body, stagger = 0, eventsExtension = f
                       textAlign: 'left',
                     }}
                   >
-                    {EVENTS_CTA_BODY}
+                    {withHighlights(EVENTS_CTA_BODY, ['fill the room'])}
                   </p>
               </motion.div>
             </div>
@@ -370,30 +388,30 @@ function WhoWeAre() {
   // inside the container — none get clipped at the section's right edge.
   const photos = [
     {
-      src: '/images/events/learning-aws-workshop.png',
-      alt: 'Members working on laptops at an AWS workshop',
-      rotate: '-7deg',
-      top: '4%',
-      left: '2%',
-      width: '66%',
+      src: '/images/about/who-we-are-collab.png',
+      alt: 'Members collaborating at a workshop table',
+      rotate: '-9deg',
+      top: '10%',
+      left: '0%',
+      width: '58%',
       z: 1,
     },
     {
-      src: '/images/events/learning-aif2.png',
-      alt: 'Crowd at the AI @ UCI booth at the Involvement Fair',
-      rotate: '6deg',
-      top: '24%',
-      left: '30%',
-      width: '66%',
+      src: '/images/about/who-we-are-deepracer.png',
+      alt: 'AWS DeepRacer event with members watching the track',
+      rotate: '8deg',
+      top: '22%',
+      left: '44%',
+      width: '58%',
       z: 2,
     },
     {
       src: '/images/events/team-2026.png',
       alt: 'AI @ UCI officer team group photo',
       rotate: '-2deg',
-      top: '10%',
-      left: '15%',
-      width: '70%',
+      top: '0%',
+      left: '16%',
+      width: '72%',
       z: 3,
     },
   ]
@@ -404,11 +422,11 @@ function WhoWeAre() {
       className="who-we-are"
       style={{
         maxWidth: 1200,
-        margin: '0 auto 24px',
+        margin: '0 auto 12px',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 64,
-        alignItems: 'center',
+        gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 520px)',
+        gap: 56,
+        alignItems: 'start',
       }}
     >
       {/* Left column: heading + body + stats */}
@@ -439,9 +457,10 @@ function WhoWeAre() {
               maxWidth: 540,
             }}
           >
-            AI @ UCI is UC Irvine&apos;s student-run artificial intelligence club. We bring together
-            builders, researchers, and curious minds to learn by doing through hands-on workshops,
-            real projects, and a community that grows together every quarter.
+            {withHighlights(
+              "AI @ UCI is UC Irvine's student-run artificial intelligence club. We bring together builders, researchers, and curious minds to learn by doing through hands-on workshops, real projects, and a community that grows together every quarter.",
+              ['artificial intelligence', 'builders', 'hands-on', 'grows'],
+            )}
           </p>
         </FadeItem>
 
@@ -463,38 +482,55 @@ function WhoWeAre() {
         </FadeItem>
       </div>
 
-      {/* Right column: fanned photo stack — each card fades + rotates into place */}
-      <ScrollParallax
-        className="who-we-are-photos"
-        style={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '1 / 1',
-          minHeight: 380,
-        }}
-        yOffset={36}
+      {/* Right column: fanned photo stack — top-aligned with heading */}
+      <div
+        className="who-we-are-photos-wrap"
+        style={{ width: '100%', maxWidth: 500, marginLeft: 'auto', overflow: 'visible' }}
       >
-        {photos.map((p, i) => (
-          <RevealFanPhoto
-            key={i}
-            src={p.src}
-            alt={p.alt}
-            index={i}
-            rotate={p.rotate}
+        <ScrollParallax
+          className="who-we-are-photos"
+          style={{
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '1 / 1',
+            minHeight: 400,
+            overflow: 'visible',
+          }}
+          yOffset={24}
+        >
+          <div
             style={{
-              position: 'absolute',
-              top: p.top,
-              left: p.left,
-              width: p.width,
-              aspectRatio: '4 / 3',
-              objectFit: 'cover',
-              borderRadius: 12,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              zIndex: p.z,
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '1 / 1',
+              minHeight: 400,
+              transform: 'scale(1.1)',
+              transformOrigin: 'top right',
             }}
-          />
-        ))}
-      </ScrollParallax>
+          >
+            {photos.map((p, i) => (
+              <RevealFanPhoto
+                key={i}
+                src={p.src}
+                alt={p.alt}
+                index={i}
+                rotate={p.rotate}
+                style={{
+                  position: 'absolute',
+                  top: p.top,
+                  left: p.left,
+                  width: p.width,
+                  aspectRatio: '4 / 3',
+                  objectFit: 'cover',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  zIndex: p.z,
+                }}
+              />
+            ))}
+          </div>
+        </ScrollParallax>
+      </div>
 
       {/* Responsive: stack columns and let photos fill the row on small screens. */}
       <style>{`
@@ -503,9 +539,14 @@ function WhoWeAre() {
             grid-template-columns: 1fr !important;
             gap: 48px !important;
           }
+          .who-we-are-photos-wrap {
+            max-width: 100% !important;
+            margin-left: 0 !important;
+          }
           .who-we-are-photos {
+            max-width: 100% !important;
             aspect-ratio: 4 / 3 !important;
-            min-height: 320px !important;
+            min-height: 300px !important;
           }
         }
       `}</style>
@@ -558,7 +599,7 @@ export default function AboutSection() {
     >
       <WhoWeAre />
 
-      <div>
+      <div style={{ marginTop: -8 }}>
         <FadeUp>
           <h2
             style={{
@@ -584,6 +625,7 @@ export default function AboutSection() {
           icon={<LearningIcon />}
           title="Learning"
           body="We run workshops every week on the tools people actually ship with. Claude, AWS, Cursor, NVIDIA stacks, Supabase. Not intro slides, not surface-level overviews. You come in, you build something that works, and you leave understanding why it works. The goal is that you walk out with something you can actually use."
+          bodyHighlights={['ship', 'build']}
         />
 
         <Pillar
@@ -595,6 +637,7 @@ export default function AboutSection() {
           icon={<CommunityIcon />}
           title="Community"
           body="Engineers, researchers, and founders come through to talk about what they're really working on. Not polished keynotes, actual conversations about what's hard and what's working. Outside of that, we meet every Wednesday and the room fills up fast. Show up once and you'll know people by the end of the night."
+          bodyHighlights={['founders', 'Show up']}
           stagger={0.1}
         />
 
@@ -607,6 +650,7 @@ export default function AboutSection() {
           icon={<ProjectsIcon />}
           title="Projects"
           body="CACTUS, Winter Quarter Project, AWS CloudHacks 2026. These aren't school assignments with a rubric. They're real projects with real timelines, built by small teams who actually care about the outcome. The kind of thing you can pull up in an interview and walk someone through start to finish."
+          bodyHighlights={['timelines', 'interview']}
           stagger={0.2}
           eventsExtension
         />

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { FadeStagger, FadeItem } from '@/components/ui/motion-primitives'
+import { withHighlights } from '@/components/ui/highlighted-text'
 import { MEETING_INFO_SHORT } from './about'
 
 export default function ScheduleSection() {
@@ -62,7 +63,10 @@ export default function ScheduleSection() {
               maxWidth: 624,
             }}
           >
-            Drop your email, follow on Instagram, or just show up Wednesday.
+            {withHighlights(
+              'Drop your email, follow on Instagram, or just show up Wednesday.',
+              ['email', 'Instagram', 'Wednesday'],
+            )}
           </p>
         </FadeItem>
 

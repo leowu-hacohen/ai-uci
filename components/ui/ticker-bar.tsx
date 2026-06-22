@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { FadeUp, REVEAL_EASE } from './motion-primitives'
 
 // h: per-logo optical-size multiplier applied to BASE_HEIGHT
 // w: per-logo slot-width multiplier (defaults to 1)
-type Logo = { src: string; alt: string; h: number; w?: number }
+// scale: visual scale on the image without changing slot width
+type Logo = { src: string; alt: string; h: number; w?: number; scale?: number }
 const LOGOS: Logo[] = [
   { src: '/images/sponsors/claude.png',   alt: 'Claude',   h: 1.0  },
   { src: '/images/sponsors/cactus.png',   alt: 'Cactus',   h: 1.15 },
@@ -14,7 +14,7 @@ const LOGOS: Logo[] = [
   { src: '/images/sponsors/lovable.png',  alt: 'Lovable',  h: 2.0  },
   { src: '/images/sponsors/supabase.png', alt: 'Supabase', h: 1.0  },
   { src: '/images/sponsors/sunstone.png', alt: 'Sunstone', h: 1.0  },
-  { src: '/images/sponsors/aws.png',      alt: 'AWS',      h: 1.0, w: 0.65 },
+  { src: '/images/sponsors/aws.png',      alt: 'AWS',      h: 1.0, w: 0.65, scale: 1.3 },
 ]
 
 const BASE_HEIGHT = 32
@@ -24,7 +24,7 @@ const SLOT_HEIGHT = 72
 // Cascades with hero intro: logo fade starts 260ms + 350ms ramp (~610ms full).
 // Ticker picks up as the anteater lands, then reel follows immediately.
 const INTRO_DELAY = 0.55
-const REEL_STAGGER = 0.24
+const REEL_STAGGER = 0.17
 const BACKED_BY_DELAY = INTRO_DELAY
 const REEL_DELAY = INTRO_DELAY + REEL_STAGGER
 const BACKED_BY_DURATION = 0.7
@@ -32,12 +32,7 @@ const REEL_FADE_DURATION = 0.85
 
 export default function TickerBar() {
   const reduce = useReducedMotion()
-  const [marqueeActive, setMarqueeActive] = useState(reduce)
   const items = [...LOGOS, ...LOGOS]
-
-  useEffect(() => {
-    if (reduce) setMarqueeActive(true)
-  }, [reduce])
 
   return (
     <div
@@ -53,7 +48,7 @@ export default function TickerBar() {
       }}
     >
       <FadeUp trigger="mount" delay={BACKED_BY_DELAY} y={8} duration={BACKED_BY_DURATION}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, marginBottom: 16 }}>
           <span
             style={{
               fontFamily: 'PPNeueMontreal, Arial, sans-serif',
@@ -75,9 +70,6 @@ export default function TickerBar() {
           duration: REEL_FADE_DURATION,
           ease: REVEAL_EASE,
         }}
-        onAnimationComplete={() => {
-          if (!reduce) setMarqueeActive(true)
-        }}
         style={{
           position: 'relative',
           WebkitMaskImage:
@@ -91,8 +83,8 @@ export default function TickerBar() {
           style={{
             display: 'flex',
             width: 'max-content',
-            animation: marqueeActive ? 'ticker-scroll 32s linear infinite' : 'none',
-            willChange: marqueeActive ? 'transform' : 'auto',
+            animation: reduce ? 'none' : 'ticker-scroll 32s linear infinite',
+            willChange: reduce ? 'auto' : 'transform',
             transform: 'translate3d(0, 0, 0)',
             backfaceVisibility: 'hidden',
           }}
@@ -123,6 +115,7 @@ export default function TickerBar() {
                     maxWidth: slotW - 40,
                     objectFit: 'contain',
                     opacity: 0.9,
+                    transform: logo.scale ? `scale(${logo.scale})` : undefined,
                   }}
                 />
               </div>

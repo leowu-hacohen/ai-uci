@@ -1,5 +1,6 @@
 'use client'
 import { FadeStagger, FadeItem, FadeUp, RevealFanPhoto, ScrollParallax } from '@/components/ui/motion-primitives'
+import { withHighlights } from '@/components/ui/highlighted-text'
 import TeamSection from './team'
 
 const BODY_STYLE: React.CSSProperties = {
@@ -12,8 +13,8 @@ const BODY_STYLE: React.CSSProperties = {
 
 const photos = [
   {
-    src: '/images/events/learning-aws-workshop.png',
-    alt: 'Members working on laptops at an AWS workshop',
+    src: '/images/about/who-we-are-collab.png',
+    alt: 'Members collaborating at a workshop table',
     rotate: '-7deg',
     top: '4%',
     left: '2%',
@@ -21,8 +22,8 @@ const photos = [
     z: 1,
   },
   {
-    src: '/images/events/learning-aif2.png',
-    alt: 'Crowd at the AI @ UCI booth at the Involvement Fair',
+    src: '/images/about/who-we-are-deepracer.png',
+    alt: 'AWS DeepRacer event with members watching the track',
     rotate: '6deg',
     top: '24%',
     left: '30%',
@@ -106,10 +107,10 @@ export default function AboutPageContent() {
           <div>
             <FadeItem>
               <p style={{ ...BODY_STYLE, margin: 0 }}>
-                AI @ UCI is UC Irvine&apos;s student-run artificial intelligence club. We bring
-                together builders, researchers, and curious minds to learn by doing through
-                hands-on workshops, real projects, and a community that grows together every
-                quarter.
+                {withHighlights(
+                  "AI @ UCI is UC Irvine's student-run artificial intelligence club. We bring together builders, researchers, and curious minds to learn by doing through hands-on workshops, real projects, and a community that grows together every quarter.",
+                  ['artificial intelligence', 'builders', 'hands-on', 'grows'],
+                )}
               </p>
             </FadeItem>
             <FadeItem>
@@ -135,6 +136,7 @@ export default function AboutPageContent() {
               width: '100%',
               maxWidth: 340,
               marginRight: 'auto',
+              marginTop: 16,
               aspectRatio: '4 / 3',
             }}
             yOffset={24}
@@ -200,11 +202,10 @@ export default function AboutPageContent() {
             Our mission
           </h2>
           <p style={{ ...BODY_STYLE, textAlign: 'center', margin: 0 }}>
-            We exist to make AI accessible and practical for every student at UCI. Not theory for a
-            slide deck, not hype for a resume line. You build, you ship, you understand why it
-            works. Workshops teach the tools people actually use. Projects give you something real
-            to talk about in an interview. Community means you know people who will push you and
-            have your back.
+            {withHighlights(
+              'We exist to make AI accessible and practical for every student at UCI. Not theory for a slide deck, not hype for a resume line. You build, you ship, you understand why it works. Workshops teach the tools people actually use. Projects give you something real to talk about in an interview. Community means you know people who will push you and have your back.',
+              ['accessible', 'have your back'],
+            )}
           </p>
         </FadeUp>
       </section>

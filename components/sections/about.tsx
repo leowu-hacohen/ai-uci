@@ -370,8 +370,9 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
             /* On mobile the big right-column icon is hidden and the inline
                mobile icon (next to the pill label) takes over. Pill sits left,
                icon flush right (justify-content: space-between on the row).
-               Icon ~35px (0.8x of previous 44). Body text tightens to ~18px
-               below the pill row instead of the default 40. */
+               Icon ~35px (matches the pill height). Body text tightens to ~18px
+               below the pill row instead of the default 40. Icons may be
+               <svg> or <img> depending on which set of art is loaded. */
             .pillar-icon-desktop {
               display: none !important;
             }
@@ -383,9 +384,12 @@ function Pillar({ id, photo, icon, title, body, bodyHighlights, stagger = 0, eve
               display: inline-flex !important;
               align-items: center !important;
             }
-            .pillar-icon-mobile svg {
-              width: 35px !important;
+            .pillar-icon-mobile svg,
+            .pillar-icon-mobile img {
+              width: auto !important;
               height: 35px !important;
+              max-width: 35px !important;
+              max-height: 35px !important;
             }
             .pillar-row p {
               margin-top: 18px !important;
@@ -574,15 +578,24 @@ function WhoWeAre() {
       </div>
 
       {/* Responsive: stack columns and let photos fill the row on small screens.
-          On iPhone SE / narrow phones, the inner 400px min-height on the photo
-          stack was forcing the viewport wider than 327px, which clipped the
-          body text and stat labels. Drop the inner min-height too so the
-          aspect-ratio derives a width that fits the column. */}
+          Body p uses overflow-wrap so long inline spans (e.g. the highlighted
+          "artificial intelligence" phrase) wrap inside the column instead of
+          forcing the grid wider than the viewport. min-width:0 on grid items
+          is the standard fix for grid blowout — without it, items default to
+          min-width:auto which equals their min-content width. */}
       <style>{`
         @media (max-width: 768px) {
           .who-we-are {
             grid-template-columns: 1fr !important;
             gap: 48px !important;
+          }
+          .who-we-are > * {
+            min-width: 0 !important;
+          }
+          .who-we-are p {
+            max-width: 100% !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
           }
           .who-we-are-photos-wrap {
             max-width: 100% !important;
